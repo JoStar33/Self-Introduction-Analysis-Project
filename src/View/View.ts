@@ -6,7 +6,6 @@ import {LabelView} from "./Entities/LabelView/LabelView";
 import {Annotator} from "../Annotator";
 import {Label} from "../Store/Label";
 import {ContentEditor} from "./Entities/ContentEditor/ContentEditor";
-import {some} from "../Infrastructure/Option";
 
 export interface Config extends LabelView.Config {
     readonly contentClasses: Array<string>;
@@ -20,6 +19,7 @@ export interface Config extends LabelView.Config {
     readonly contentEditable: boolean;
 }
 
+
 export class View {
     readonly contentFont: Font.ValueObject;
     readonly labelFont: Font.ValueObject;
@@ -27,6 +27,7 @@ export class View {
     readonly textElement: SVGTextElement;
     readonly lines: Array<Line.ValueObject>;
     readonly lineMaxWidth: number;
+    readonly lineBeginEndWidth : number;
     readonly labelViewRepository: LabelView.Repository;
     readonly store: Store;
 
@@ -37,31 +38,31 @@ export class View {
         readonly svgElement: SVGSVGElement,
         readonly config: Config
     ) {
-
         this.store = root.store;
         this.labelViewRepository = new LabelView.Repository();
-        //svgElement.style.width = "1500";
         this.textElement = document.createElementNS(SVGNS, 'text') as SVGTextElement;
         this.textElement.style.alignmentBaseline = "middle";
         this.textElement.style.wordWrap = "normal";
         this.textElement.style.whiteSpace="pre"
-
         this.svgElement.appendChild(this.textElement);
         const labelText = Array.from(this.store.labelCategoryRepo.values()).map(it => it.text).join('');
         [this.contentFont, this.labelFont] = Font.Factory.startBatch(svgElement, this.textElement)
             .thanCreate(config.contentClasses, this.store.content)
             .thanCreate(config.labelClasses, labelText)
             .endBatch();
-        this.topContextLayerHeight = config.topContextMargin; //이부분 수정해서 카테고리 마진문제 해결
+        //이부분 수정해서 카테고리 마진문제 해결
+        this.topContextLayerHeight = config.topContextMargin; 
         this.textElement.classList.add(...config.contentClasses);
         this.lineMaxWidth = svgElement.width.baseVal.value - 2 * this.paddingLeft;
+        //여기서도 divide가 동작한다. 따라서 divide 자체를 손봐서 줄을 못넘기도록 만들었다.
         this.lines = Line.Service.divide(this, 0, this.store.content.length);
-        this.lines.map(this.constructLabelViewsForLine.bind(this));
+        this.constructLabelViewsForLine(this.lines);
         const tspans = this.lines.map(it => it.render());
         this.textElement.append(...tspans);
         this.svgElement.style.height = this.height.toString() +'px';
-        //텍스트 마진문제 해결
         this.svgElement.setAttribute('viewBox','0 -20 '+ (svgElement.width.baseVal.value)+' '+ (this.height+30).toString());
+        
+        //이벤트를 주는 함수.
         this.registerEventHandlers();
         if (this.config.contentEditable) {
             this.contentEditor = new ContentEditor(this);
@@ -80,12 +81,49 @@ export class View {
         currentLine.topContext.update();
     }
 
-    private constructLabelViewsForLine(line: Line.ValueObject): Array<LabelView.Entity> {
-        const labels = this.store.labelRepo.getEntitiesInRange(line.startIndex, line.endIndex);
-        const labelViews = labels.map(it => new LabelView.Entity(it, line.topContext, this.config));
-        labelViews.map(it => this.labelViewRepository.add(it));
-        labelViews.map(it => line.topContext.addChild(it));
-        return labelViews;
+    //라벨을 재구성 혹은 생성하는 부분.
+    private constructLabelViewsForLine(lines: Array<Line.ValueObject>){
+        //this.store.labelRepo는 라벨 저장소에 저장된 값을 가져온다는 의미.
+        let labelViews = null;
+        let saveLabel = Array;
+        let checkFirstArray = new Array<boolean>();
+        let saveLabelPoint = 0;
+        for(let makesaveLabel = 0; makesaveLabel < this.store.labelRepo.length; ++makesaveLabel){
+            saveLabel[makesaveLabel] = null;
+        }
+
+        for(let save_push = 0; save_push < this.store.labelRepo.length; ++save_push){
+            checkFirstArray[save_push] = false;
+        }
+        
+        for(const entityLines of lines){
+            const labels = this.store.labelRepo.getEntitiesInRange(entityLines.startIndex, entityLines.endIndex);
+            for(let save_push = this.store.labelRepo.length - 1; save_push >= 0; --save_push){ 
+                //뒤에서부터 하고, 배열 맨처음에 넣도록 설정. 이렇게 하는 이유는 라인을 넘어간
+                //라벨이 그 라벨 안으로 들어온 라벨의 색을 잡아먹는 문제를 해결하기 위해서 이다.
+                if(saveLabel[save_push] !== null){
+                    labels.unshift(saveLabel[save_push]);
+                    saveLabel[save_push] = null;
+                }
+            }
+            for(const entityLabels of labels){
+                if(entityLabels.endIndex > entityLines.endIndex){
+                    saveLabel[saveLabelPoint] = new Label.Entity(entityLabels.id, entityLabels.categoryId, entityLines.endIndex + 1, entityLabels.endIndex, this.store);
+                    labelViews = new LabelView.Entity(new Label.Entity(entityLabels.id, entityLabels.categoryId, entityLabels.startIndex, entityLines.endIndex, this.store),
+                    entityLines.topContext, this.config, checkFirstArray[entityLabels.id]);
+                    checkFirstArray[entityLabels.id] = true;
+                    ++saveLabelPoint;
+                    this.labelViewRepository.add(labelViews);
+                    entityLines.topContext.addChild(labelViews);
+                }
+                else{
+                    labelViews = new LabelView.Entity(entityLabels, entityLines.topContext, this.config, checkFirstArray[entityLabels.id]);
+                    this.labelViewRepository.add(labelViews); 
+                    entityLines.topContext.addChild(labelViews);
+                }
+            }
+            saveLabelPoint = 0;
+        }
     }
 
 
@@ -93,33 +131,8 @@ export class View {
         return this.lines.reduce((currentValue, line) => currentValue + line.height + this.contentFont.fontSize * (this.config.lineHeight - 1), 20);
     }
 
-    static createMarkerElement(): SVGMarkerElement {
-        const markerArrow = document.createElementNS(SVGNS, 'path');
-        markerArrow.setAttribute('d', "M0,4 L0,8 L6,6 L0,4 L0,8");
-        markerArrow.setAttribute("stroke", "#000000");
-        markerArrow.setAttribute("fill", "#000000");
-        const markerElement = document.createElementNS(SVGNS, 'marker');
-        markerElement.setAttribute('id', 'marker-arrow');
-        markerElement.setAttribute('markerWidth', '8');
-        markerElement.setAttribute('markerHeight', '10');
-        markerElement.setAttribute('orient', 'auto');
-        markerElement.setAttribute('refX', '5');
-        markerElement.setAttribute('refY', '6');
-        markerElement.appendChild(markerArrow);
-        return markerElement;
-    };
-
     public contentWidth(startIndex: number, endIndex: number): number {
         return this.contentFont.widthOf(this.store.contentSlice(startIndex, endIndex));
-    }
-
-    private removeLine(line: Line.ValueObject) {
-        line.remove();
-        line.topContext.children.forEach(it => {
-            if (it instanceof LabelView.Entity) {
-                this.labelViewRepository.delete(it);
-            }
-        });
     }
 
     private registerEventHandlers() {
@@ -133,65 +146,66 @@ export class View {
         };
         this.store.labelRepo.on('created', this.onLabelCreated.bind(this));
         this.store.labelRepo.on('removed', (label: Label.Entity) => {
-            let viewEntity = this.labelViewRepository.get(label.id!);
-            viewEntity.lineIn.topContext.removeChild(viewEntity);
-            viewEntity.remove();
-            this.labelViewRepository.delete(viewEntity);
-            viewEntity.lineIn.topContext.update();
-            viewEntity.lineIn.update();
-            View.layoutTopContextsAfter(viewEntity.lineIn);
-            if (this.config.contentEditable)
-                this.contentEditor.update();
-        });
-
-        if (this.config.contentEditable) {
-            this.store.on('contentSpliced', this.onContentSpliced.bind(this));
-        }
-    }
-
-    private rerenderLines(beginLineIndex: number, endInLineIndex: number) {
-        const parent = this.lines[0].svgElement.parentElement as any as SVGTextElement;
-        for (let i = beginLineIndex; i <= endInLineIndex; ++i) {
-            this.removeLine(this.lines[i]);
-        }
-        const begin = this.lines[beginLineIndex];
-        const endIn = this.lines[endInLineIndex];
-        const newDividedLines = Line.Service.divide(this, begin.startIndex, endIn.endIndex);
-        if (newDividedLines.length !== 0) {
-            newDividedLines[0].last = begin.last;
-            begin.last.map(it => it.next = some(newDividedLines[0]));
-            newDividedLines[newDividedLines.length - 1].next = endIn.next;
-            endIn.next.map(it => it.last = some(newDividedLines[newDividedLines.length - 1]));
-            this.lines.splice(beginLineIndex, endInLineIndex - beginLineIndex + 1, ...newDividedLines);
-            if (beginLineIndex === 0) {
-                if (!endIn.next.isSome) {
-                    newDividedLines[0].insertInto(parent);
-                } else {
-                    newDividedLines[0].insertBefore(endIn.next);
-                }
-            } else {
-                newDividedLines[0].insertAfter(begin.last);
+            //remove를 하되, 라인에 매치가 되는 값들을 삭제하도록. 아이디가 일치하는 값이 있다면.
+            //제대로 돌아간다!!!!!!!!!!!!!!!!!!!!!!!!나이스!!!!!!!!!!
+            //삭제가 성공적으로 적용!
+            let viewEntity = this.labelViewRepository.getAll(label.id!);
+            for (const entity of viewEntity) {
+                entity.lineIn.topContext.removeChild(entity);
+                entity.remove();         
+                while(this.labelViewRepository.get(label.id!).id === undefined){
+                    this.labelViewRepository.delete(entity);  
+                } 
+                entity.lineIn.topContext.update();
+                entity.lineIn.update();
+                View.layoutTopContextsAfter(entity.lineIn);
+                if (this.config.contentEditable)
+                    this.contentEditor.update();      
             }
-        }
-        for (let i = 1; i < newDividedLines.length; ++i) {
-            newDividedLines[i].insertAfter(some(newDividedLines[i - 1]));
-        }
-        for (let line of newDividedLines) {
-            let labelViews = this.constructLabelViewsForLine(line);
-            labelViews.map(it => line.topContext.renderChild(it));
-        }
-        for (let line of newDividedLines) {
-            line.update();
+        });
+    }
+
+
+    private MakeDivideLongLabel(startInLineIndex: number, endInLineIndex: number, label: Label.Entity) {
+        let checkFirst = false;
+        for(let i = startInLineIndex; i < endInLineIndex; i++ ){
+            let LongLabel = label;
+            if(i === startInLineIndex){
+                LongLabel = new Label.Entity(label.id, label.categoryId, label.startIndex, this.lines[i].endIndex, this.store);
+            }
+            else if(i === endInLineIndex - 1){
+                LongLabel = new Label.Entity(label.id, label.categoryId, this.lines[i].startIndex, label.endIndex, this.store);
+            }
+            else{
+                LongLabel = new Label.Entity(label.id, label.categoryId, this.lines[i].startIndex, this.lines[i].endIndex, this.store);
+            }
+            //소스가 다소 불안정적임. 수정이 필요함. 
+            //Repository.add 내부함수에 수정을 가했기 때문에 동작하는 소스이다.
+            const line = this.lines[i];
+            const labelView = new LabelView.Entity(LongLabel, line.topContext, this.config, checkFirst);
+            checkFirst = true;
+            //아이디를 다르게 줘야하나...?
+            //허나 문제해결! 아이디를 동일하게 주더라도 라벨뷰에는 저장이 되는걸 알게되었다!
+            this.labelViewRepository.add(labelView);
+            line.topContext.addChild(labelView);
+            line.topContext.renderChild(labelView);
             line.topContext.update();
+            line.update();
+            /* For Test.
+            console.warn(`line "${i}'s id:"${this.labelViewRepository.get(testLabel.id).id}"`);
+            */
         }
     }
 
+    //라벨링을 할때 동작하는 메소드가 이녀석이다.
     private onLabelCreated(label: Label.Entity) {
         let [startInLineIndex, endInLineIndex] = this.findRangeInLines(label.startIndex, label.endIndex);
-        // in one line
+        //startInLineIndex는 라벨링 시작라인 endInLineIndex는 라벨링이 끝나는 라인.
+        //in one line
         if (endInLineIndex === startInLineIndex + 1) {
+            console.warn(`onLabelCreated-Method's startInLineIndex ,endInLineIndex:"${startInLineIndex}, ${endInLineIndex}"! When if (endInLineIndex === startInLineIndex + 1)`);
             const line = this.lines[startInLineIndex];
-            const labelView = new LabelView.Entity(label, line.topContext, this.config);
+            const labelView = new LabelView.Entity(label, line.topContext, this.config, false);
             this.labelViewRepository.add(labelView);
             line.topContext.addChild(labelView);
             line.topContext.renderChild(labelView);
@@ -199,8 +213,8 @@ export class View {
             line.update();
         } else {
             // in many lines
-            let hardLineEndInIndex = this.findHardLineEndsInIndex(startInLineIndex);
-            this.rerenderLines(startInLineIndex, hardLineEndInIndex);
+            //긴줄이 감지되면 동작하는 소스는 이녀석. 긴줄의 시작지점과 끝지점을 넘겨준다.
+            this.MakeDivideLongLabel(startInLineIndex, endInLineIndex, label);
         }
         View.layoutTopContextsAfter(this.lines[startInLineIndex]);
         if (this.config.contentEditable)
@@ -220,97 +234,6 @@ export class View {
             }
         });
         return [startInLineIndex, endInLineIndex];
-    }
-
-
-    // todo: unit test
-    private onContentSpliced(startIndex: number, removed: string, inserted: string) {
-        if (removed !== "")
-            this.onRemoved(startIndex, removed);
-        if (inserted !== "")
-            this.onInserted(startIndex, inserted);
-    }
-
-    private onRemoved(startIndex: number, removed: string) {
-        let [startInLineIndex, _] = this.findRangeInLines(startIndex, startIndex + 1);
-        if (this.lines[startInLineIndex].startIndex === startIndex - removed.length) {
-            this.lines[startInLineIndex].move(-removed.length);
-        } else {
-            this.lines[startInLineIndex].inserted(-removed.length);
-        }
-        let currentLineIndex = startInLineIndex + 1;
-        while (currentLineIndex < this.lines.length) {
-            this.lines[currentLineIndex].move(-removed.length);
-            ++currentLineIndex;
-        }
-        let hardLineEndInIndex = this.findHardLineEndsInIndex(startInLineIndex);
-
-        if (removed === "\n" && this.lines[startInLineIndex].isBlank) {
-            let last = this.lines[startInLineIndex].last;
-            let next = this.lines[startInLineIndex].next;
-            this.lines[startInLineIndex].remove();
-            this.lines.splice(startInLineIndex, 1);
-            last.map(it => it.next = next);
-            next.map(it => it.last = last);
-        } else {
-            this.rerenderLines(startInLineIndex, hardLineEndInIndex);
-        }
-        View.layoutTopContextsAfter(this.lines[hardLineEndInIndex - 1]);
-        const asArray = Array.from(removed);
-        const removedLineCount = asArray.filter(it => it === "\n").length;
-        if (removedLineCount === 0) {
-            this.contentEditor.characterIndex -= removed.length;
-            this.contentEditor.avoidInLabel("forward");
-        } else {
-            if (this.contentEditor.lineIndex - removedLineCount >= 0) {
-                this.contentEditor.lineIndex -= removedLineCount;
-                this.contentEditor.characterIndex = this.contentEditor.line.content.length;
-                this.contentEditor.avoidInLabel("forward");
-            }
-        }
-        this.contentEditor.update();
-        this.svgElement.style.height = this.height.toString() + 'px';
-    }
-
-    //줄넘기는 부분
-    private onInserted(startIndex: number, inserted: string) {
-        let [startInLineIndex, _] = this.findRangeInLines(startIndex, startIndex + 1);
-        if (this.lines[startInLineIndex].startIndex === startIndex + inserted.length) {
-            this.lines[startInLineIndex].move(inserted.length);
-        } else {
-            this.lines[startInLineIndex].inserted(inserted.length);
-        }
-        let currentLineIndex = startInLineIndex + 1;
-        while (currentLineIndex < this.lines.length) {
-            this.lines[currentLineIndex].move(inserted.length);
-            ++currentLineIndex;
-        }
-        let hardLineEndInIndex = this.findHardLineEndsInIndex(startInLineIndex);
-        this.rerenderLines(startInLineIndex, hardLineEndInIndex);
-        View.layoutTopContextsAfter(this.lines[hardLineEndInIndex]);
-        const asArray = Array.from(inserted);
-        const newLineCount = asArray.filter(it => it === "\n").length;
-        const lastNewLineIndex = asArray.lastIndexOf("\n");
-        const afterLastNewLine = inserted.length - lastNewLineIndex;
-        if (newLineCount === 0) {
-            this.contentEditor.characterIndex += inserted.length;
-            this.contentEditor.avoidInLabel("forward");
-        } else {
-            this.contentEditor.lineIndex += newLineCount;
-            this.contentEditor.characterIndex = afterLastNewLine - 1;
-            this.contentEditor.avoidInLabel("forward");
-        }
-        this.contentEditor.update();
-        this.svgElement.style.height = this.height.toString() + 'px';
-    }
-
-    private findHardLineEndsInIndex(startInLineIndex: number) {
-        let hardLineEndInIndex: number;
-        for (hardLineEndInIndex = startInLineIndex;
-             hardLineEndInIndex < this.lines.length - 1 && !this.lines[hardLineEndInIndex].endWithHardLineBreak;
-             ++hardLineEndInIndex) {
-        }
-        return hardLineEndInIndex;
     }
 
     private collectStyle(): SVGStyleElement {
