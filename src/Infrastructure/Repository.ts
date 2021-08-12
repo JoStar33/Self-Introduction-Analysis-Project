@@ -1,6 +1,7 @@
 import {assert} from "./Assert";
 import {EventEmitter} from "events";
 
+//저장소. JsonFile을 읽어서 가지고오는, 흡사 SQLDeveloper와 유사한 구조라고 보면 될듯.
 export namespace Base {
     export class Repository<T> extends EventEmitter {
         protected entities = new Map<number, T>();
@@ -27,6 +28,16 @@ export namespace Base {
             return this.entities.get(key)!;
         }
 
+        getAll(key: number): Array<object> {
+            let result = [];
+            for (const entity of this.entities) {
+                if(key in this.entities){
+                    result.push(entity as any)
+                }
+            }
+            return result;
+        }
+
         has(key: number): boolean {
             return this.entities.has(key);
         }
@@ -47,9 +58,13 @@ export namespace Base {
 
         add(value: T): number {
             if ('id' in value) {
+                //아이디 중복을 허용.
                 let id: number = (value as any).id;
-                assert(!this.has(id), `reAdd ${id}!`);
+                //assert(!this.has(id), `reAdd ${id}!`);
                 if (id !== null) {
+                    while(this.has(id)){
+                        ++id;
+                    }
                     this.set(id, value);
                 } else {
                     (value as any).id = this.nextId;
