@@ -1,0 +1,23 @@
+map() 메서드는 배열 내의 모든 요소 각각에 대하여 주어진 함수를 호출한 결과를 모아 새로운 배열을 반환합니다.
+TypeScript에서 접두사 !는 식 유형에서 null와 undefined를 제거합니다.
+filter는 콜백함수로 지정된 조건에 맞는 요소를 다시 반환한다.
+
+getBoundingClientRect는 요소의 다양한 값을 가지는 함수인데 해당 값을 통해 요소의 다양한 값들을 반환하는 식이 아래이다.
+간단하게 예를들어서
+const ele = document.querySelector('#test');
+const imgRect = ele.getBoundingClientRect();
+console(imgRect);
+출력결과
+{
+    bottom: 178
+    height: 44
+    left: 212.5
+    right: 1092.5
+    top: 134
+    width: 880
+    x: 212.5
+    y: 134
+}
+slice() 메서드는 어떤 배열의 begin부터 end까지(end 미포함)에 대한 얕은 복사본을 새로운 배열 객체로 반환합니다
+
+제일 중요한 소스는 Line과 View라는점 꼭 인지하기.

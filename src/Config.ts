@@ -2,6 +2,7 @@ import {Config as ViewConfig} from "./View/View";
 import {Config as StoreConfig} from "./Store/Store";
 import {Config as TextSelectionHandlerConfig} from "./View/EventHandler/TextSelectionHandler";
 
+//Config 인터페이스 정의
 export interface ConfigInput {
     readonly contentClasses?: Array<string>;
     readonly labelClasses?: Array<string>;
@@ -18,9 +19,12 @@ export interface ConfigInput {
     readonly contentEditable?: boolean;
 }
 
+//config=구성을 의미한다는거 참고
 export interface Config extends ViewConfig, StoreConfig, TextSelectionHandlerConfig{
 }
 
+
+//Config의 디폴트값
 const defaultValues: Config = {
     contentClasses: ['poplar-annotation-content'],
     labelClasses: ['poplar-annotation-label'],

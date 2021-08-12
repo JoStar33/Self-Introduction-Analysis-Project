@@ -30,16 +30,16 @@ export class View {
     readonly lineBeginEndWidth : number;
     readonly labelViewRepository: LabelView.Repository;
     readonly store: Store;
-
     readonly contentEditor: ContentEditor = null as any;
 
     constructor(
         readonly root: Annotator,
         readonly svgElement: SVGSVGElement,
         readonly config: Config
-    ) {
+    ){
         this.store = root.store;
         this.labelViewRepository = new LabelView.Repository();
+        
         this.textElement = document.createElementNS(SVGNS, 'text') as SVGTextElement;
         this.textElement.style.alignmentBaseline = "middle";
         this.textElement.style.wordWrap = "normal";
@@ -98,12 +98,12 @@ export class View {
         
         for(const entityLines of lines){
             const labels = this.store.labelRepo.getEntitiesInRange(entityLines.startIndex, entityLines.endIndex);
-            for(let save_push = this.store.labelRepo.length - 1; save_push >= 0; --save_push){ 
+            for(let sCount = this.store.labelRepo.length - 1; sCount >= 0; --sCount){ 
                 //뒤에서부터 하고, 배열 맨처음에 넣도록 설정. 이렇게 하는 이유는 라인을 넘어간
                 //라벨이 그 라벨 안으로 들어온 라벨의 색을 잡아먹는 문제를 해결하기 위해서 이다.
-                if(saveLabel[save_push] !== null){
-                    labels.unshift(saveLabel[save_push]);
-                    saveLabel[save_push] = null;
+                if(saveLabel[sCount] !== null){
+                    labels.unshift(saveLabel[sCount]);
+                    saveLabel[sCount] = null;
                 }
             }
             for(const entityLabels of labels){
@@ -166,8 +166,8 @@ export class View {
     }
 
 
-    private MakeDivideLongLabel(startInLineIndex: number, endInLineIndex: number, label: Label.Entity) {
-        let checkFirst = false;
+    private makeDivideLongLabel(startInLineIndex: number, endInLineIndex: number, label: Label.Entity) {
+        let checkAboutFirstLabel = false;
         for(let i = startInLineIndex; i < endInLineIndex; i++ ){
             let LongLabel = label;
             if(i === startInLineIndex){
@@ -182,8 +182,8 @@ export class View {
             //소스가 다소 불안정적임. 수정이 필요함. 
             //Repository.add 내부함수에 수정을 가했기 때문에 동작하는 소스이다.
             const line = this.lines[i];
-            const labelView = new LabelView.Entity(LongLabel, line.topContext, this.config, checkFirst);
-            checkFirst = true;
+            const labelView = new LabelView.Entity(LongLabel, line.topContext, this.config, checkAboutFirstLabel);
+            checkAboutFirstLabel = true;
             //아이디를 다르게 줘야하나...?
             //허나 문제해결! 아이디를 동일하게 주더라도 라벨뷰에는 저장이 되는걸 알게되었다!
             this.labelViewRepository.add(labelView);
@@ -203,7 +203,6 @@ export class View {
         //startInLineIndex는 라벨링 시작라인 endInLineIndex는 라벨링이 끝나는 라인.
         //in one line
         if (endInLineIndex === startInLineIndex + 1) {
-            console.warn(`onLabelCreated-Method's startInLineIndex ,endInLineIndex:"${startInLineIndex}, ${endInLineIndex}"! When if (endInLineIndex === startInLineIndex + 1)`);
             const line = this.lines[startInLineIndex];
             const labelView = new LabelView.Entity(label, line.topContext, this.config, false);
             this.labelViewRepository.add(labelView);
@@ -214,7 +213,7 @@ export class View {
         } else {
             // in many lines
             //긴줄이 감지되면 동작하는 소스는 이녀석. 긴줄의 시작지점과 끝지점을 넘겨준다.
-            this.MakeDivideLongLabel(startInLineIndex, endInLineIndex, label);
+            this.makeDivideLongLabel(startInLineIndex, endInLineIndex, label);
         }
         View.layoutTopContextsAfter(this.lines[startInLineIndex]);
         if (this.config.contentEditable)

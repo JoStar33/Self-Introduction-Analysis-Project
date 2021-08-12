@@ -43,4 +43,8 @@ export class Annotator extends EventEmitter {
         this.view.svgElement.remove();
         this.store.config.contentEditable && this.view.contentEditor.remove();
     }
+
+    public width(){
+        return this.view.lineMaxWidth;
+    }
 }

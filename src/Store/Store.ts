@@ -30,6 +30,7 @@ export class Store extends EventEmitter {
     }
 
     set json(json: JSON) {
+        //endsWith>>이걸로 끝난다면?
         this._content = json.content.endsWith('\n') ? json.content : (json.content + '\n');
         LabelCategory.Factory.createAll(json.labelCategories, this.config).map(it => this.labelCategoryRepo.add(it));
         Label.Factory.createAll(json.labels, this).map(it => this.labelRepo.add(it));

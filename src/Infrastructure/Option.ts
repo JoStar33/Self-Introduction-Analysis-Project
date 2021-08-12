@@ -1,4 +1,6 @@
+//제너릭
 export class Option<T> {
+    //여기 Option내에서 가리키는 value값은 T라는 점을 인식할것
     constructor(private value: T | null) {
     }
 
@@ -6,6 +8,7 @@ export class Option<T> {
         return this.value !== null;
     }
 
+    //T를 U로 할지 안할지
     map<U>(func: (from: T) => U) {
         if (this.value === null) {
             return new Option<U>(null);

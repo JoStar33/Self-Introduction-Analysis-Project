@@ -82,11 +82,13 @@ export namespace Label {
         }
 
         getEntitiesInRange(startIndex: number, endIndex: number): Array<Entity> {
+            //index:line.startIndex, line.endIndex
             return Array.from(this.entities.values())
-                .filter(entity => startIndex <= entity.startIndex && entity.endIndex <= endIndex);
+                .filter(entity => startIndex <= entity.startIndex && endIndex >= entity.startIndex/*&& entity.endIndex <= endIndex */);
         }
 
         getEntitiesCross(index: number): Array<Entity> {
+            //label 요소 전체를 this.entities.values()로 가지고와서 조건에 맞는 요소를 가지고와서 던져준다.
             return Array.from(this.entities.values())
                 .filter(entity => entity.startIndex <= index && index < entity.endIndex);
         }

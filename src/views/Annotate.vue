@@ -110,16 +110,20 @@
                         this
                             .annotator
                             .applyAction(Action.Label.Update(this.selectedId, this.selectedLabelCategory));
+                            this.updateJSON();
                     } else if(this.clickLabelCategories){
-                        this
-                            .annotator
+                        console.warn(`Annotate.vue's this.startIndex, this.endIndex: "${this.startIndex}, ${this.endIndex}"`);
+                        console.warn(`this.annotator.width(): "${this.annotator.width()}"`);
+                        //if (this.endIndex - this.startIndex < (this.annotator.width())/12) {
+                            this.annotator
                             .applyAction(
                                 Action.Label.Create(this.selectedLabelCategory, this.startIndex, this.endIndex)
                             );
+                            this.updateJSON();
+                       //}
                     }
                     this.showLabelCategoriesDialog = false;
                     this.clickLabelCategories  = false;
-                    this.updateJSON();
                 },
 
 
@@ -213,7 +217,6 @@
         });
     </script>
     <style scoped="scoped">
-
         .container-wrapper {
             border-right: solid 2px black;
         }
@@ -224,16 +227,15 @@
             display: scroll;
         }
 
-        svg {
+        .container > svg {
             display: block;
             pointer-events: none;
-            overflow: scroll;
             width: 100%;
             height: 100%;
-            background-clip: padding-box;
+            /*background-clip: padding-box;*/
         }
 
-        g {
+        .container > g {
             pointer-events: all !important;
         }
 
@@ -244,9 +246,6 @@
         .poplar-annotation-label {
             font-size: 14px;
             font-family: Verdana, serif;
-        }
-        #container-first{
-            overflow: scroll;
         }
 
         div.container {

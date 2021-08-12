@@ -1,0 +1,71 @@
+{
+    "applicatid" : "",
+    "items": [
+        {
+            "title": "학력",
+            "labelname": "경기대학교",
+            "startDate": "20160316",
+            "endDate": "20220916"
+        }, {
+            "title": "학력",
+            "labelname": "경기대학교-대학원",
+            "startDate": "20220316",
+            "endDate": "20240316"
+        }, {
+            "title": "학력",
+            "labelname": "하버드대학교",
+            "startDate": "20240316",
+            "endDate": "20290316"
+        }, {
+            "title": "경력",
+            "labelname": "이수시스템",
+            "startDate": "20210316",
+            "endDate": "20220316"
+        }, {
+            "title": "경력",
+            "labelname": "삼성",
+            "startDate": "20220316",
+            "endDate": "20250316"
+        }, {
+            "title": "경력",
+            "labelname": "엘지",
+            "startDate": "20250316",
+            "endDate": "20290316"
+        }, {
+            "title": "교육연수",
+            "labelname": "군대",
+            "startDate": "20170116",
+            "endDate": "20181016"
+        }, {
+            "title": "교육연수",
+            "labelname": "키움증권",
+            "startDate": "20181018",
+            "endDate": "20230210"
+        }, {
+            "title": "교육연수",
+            "labelname": "YAPP",
+            "startDate": "20230214",
+            "endDate": "20231016"
+        }, {
+            "title": "교육연수",
+            "labelname": "The Creater",
+            "startDate": "20231016",
+            "endDate": "20240316"
+        }, {
+            "title": "교육연수",
+            "labelname": "Ye",
+            "startDate": "20240316",
+            "endDate": "20250316"
+        }, {
+            "title": "교육연수",
+            "labelname": "You Know What",
+            "startDate": "20250316",
+            "endDate": "20270316"
+        }, {
+            "title": "교육연수",
+            "labelname": "NoNo",
+            "startDate": "20270316",
+            "endDate": "20320316"
+        }
+    ]
+}

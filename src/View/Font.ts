@@ -33,8 +33,11 @@ export namespace Font {
             if (typeof text === "string") {
                 return this.widthOf(Array.from(text));
             } else {
+                //map() 메서드는 배열 내의 모든 요소 각각에 대하여 주어진 함수를 호출한 결과를 모아 새로운 배열을 반환합니다.
+                //TypeScript에서 접두사 !는 식 유형에서 null와 undefined를 제거합니다.
                 return text.map(it => this.width.get(it)!)
                     .reduce((a: number, b: number) => a + b, 0)
+                    //배열내에 모든값 합산.
             }
         }
     }
@@ -54,6 +57,26 @@ export namespace Font {
             characterArray.forEach((ch: string, index: number) => {
                 width.set(ch, testRenderElement.getExtentOfChar(index).width);
             });
+            /*
+            getBoundingClientRect는 요소의 다양한 값을 가지는 함수인데 해당 값을 통해 요소의 다양한 값들을 반환하는 식이 아래이다.
+            간단하게 예를들어서 
+            const ele = document.querySelector('#test');
+            const imgRect = ele.getBoundingClientRect();
+            console(imgRect);
+            //출력결과
+            {
+                bottom: 178
+                height: 44
+                left: 212.5
+                right: 1092.5
+                top: 134
+                width: 880
+                x: 212.5
+                y: 134
+            }
+            를 통해 확인할수 있다.
+            */
+           //아래는 rect element의 요소들이다.
             const topToBaseLine = baseLineReferenceElement.getBoundingClientRect().top - testRenderElement.getBoundingClientRect().top;
             const fontSize = parseFloat(window.getComputedStyle(testRenderElement).fontSize);
             const fontFamily = window.getComputedStyle(testRenderElement).fontFamily;
@@ -62,6 +85,7 @@ export namespace Font {
             return new ValueObject(fontFamily, fontSize, fontWeight, lineHeight, topToBaseLine, width);
         }
 
+        //일괄측정
         class BatchMeasurer {
             private readonly baseLineReferenceElement: SVGRectElement;
             private readonly measuringElement: SVGTSpanElement;
