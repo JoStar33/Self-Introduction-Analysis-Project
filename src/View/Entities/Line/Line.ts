@@ -306,7 +306,7 @@ export namespace Line {
             const currentQueueWidth = this.tokenQueue.length === 0 ? 0 : this.view.contentWidth(this.tokenQueue[0].startIndex, this.tokenQueue[this.tokenQueue.length - 1].endIndex);
             const currentTokenWidth = this.view.contentWidth(token.startIndex, token.endIndex);
             if (this.tokenQueue.length !== 0 && currentQueueWidth + currentTokenWidth > this.view.lineMaxWidth) {
-                this.reduce(this.tokenQueue[0].startIndex, this.tokenQueue[this.tokenQueue.length - 1].endIndex);
+                this.reduce(this.tokenQueue[0].startIndex, this.tokenQueue[this.tokenQueue.length - 1].endIndex + 1);
             }
             else {
                 this.tokenQueue.push(token);

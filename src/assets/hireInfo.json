@@ -1,0 +1,28 @@
+{
+    "users":[
+        {
+            "id": 2084657,
+            "name": "이제훈",
+            "gender": "男",
+            "age": 36,
+            "phoneNumber": "01036452422",
+            "Email_Address": "rhwkd5012@naver.com",
+            "first_place": "영업",
+            "second_place": "개발직"
+        }
+    ],
+    "keyWords": [
+        {
+            "id" : 0,
+            "keyWord": "열정"
+        },
+        {
+            "id" : 1,
+            "keyWord": "집념"
+        }, 
+        {
+            "id": 2,
+            "keyWord": "책임감"
+        }
+    ]
+}

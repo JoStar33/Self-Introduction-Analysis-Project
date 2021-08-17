@@ -13,7 +13,7 @@ export class Annotator extends EventEmitter {
     readonly textSelectionHandler: TextSelectionHandler;
     constructor(
         data: string | object,
-        private containerElement: HTMLElement,
+        containerElement: HTMLElement,
         public readonly configInput?: ConfigInput
     ) {
         super();

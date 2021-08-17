@@ -108,7 +108,7 @@ export class View {
             }
             for(const entityLabels of labels){
                 if(entityLabels.endIndex > entityLines.endIndex){
-                    saveLabel[saveLabelPoint] = new Label.Entity(entityLabels.id, entityLabels.categoryId, entityLines.endIndex + 1, entityLabels.endIndex, this.store);
+                    saveLabel[saveLabelPoint] = new Label.Entity(entityLabels.id, entityLabels.categoryId, entityLines.endIndex, entityLabels.endIndex, this.store);
                     labelViews = new LabelView.Entity(new Label.Entity(entityLabels.id, entityLabels.categoryId, entityLabels.startIndex, entityLines.endIndex, this.store),
                     entityLines.topContext, this.config, checkFirstArray[entityLabels.id]);
                     checkFirstArray[entityLabels.id] = true;

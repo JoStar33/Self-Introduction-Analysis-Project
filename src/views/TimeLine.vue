@@ -67,6 +67,9 @@ export default {
     this.Init_Of_title_Number_In_One_Line(title_Number_In_One_Line, title_Number_In_One_Line_Current);
     this.titleArray_Pusher(title_Array, title_Number_In_One_Line);
     this.Input_Into_timelineData(title_Array, title_of_Color, title_Number_In_One_Line, title_Number_In_One_Line_Current);
+    window.addEventListener("resize", function(){
+      //document.getElementById("Timeline").style.transform = "scale(0.75)";
+    });
   },
 
   methods: {
@@ -111,7 +114,7 @@ export default {
     set_MinWidth_And_MaxWidth(){
       document.getElementById("Timeline").style.minWidth = String(45 + 50 * (this.maxYear - (this.minYear - 1))) + "px";
       document.getElementById("Timeline").style.width = String(45 + 50 * (this.maxYear - (this.minYear - 1))) + "px";
-      document.getElementById("Timeline").style.maxWidth = String(104 * (this.maxYear - this.minYear) - 1) + "px";
+      document.getElementById("Timeline").style.maxWidth = String(45 + 50 * (this.maxYear - (this.minYear - 1))) + "px";
       document.getElementById("Timeline").style.minHeight = "180px";
     },
 
@@ -151,18 +154,27 @@ export default {
 <style>
     #Timeline {
       width: 100%;
+      display: flex;
       font-weight: bold !important;
       font-style: inherit !important;
+      transform: scale(0.65);
+      transform-origin : 0% center;
     }
     #Timeline > div{
-        height: 180px;
+        height: 150px;
         overflow-y: hidden;
     }
-    #Timeline > rect{
+    div#Timeline * rect{
         stroke-width: 0.5
         !important;
         stroke: black
         !important;
     }
+    /*
+    div#Timeline * svg{
+      transform: scale(0.75) !important;
+    }
+    */
 </style>
+
 

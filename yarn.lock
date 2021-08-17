@@ -8983,7 +8983,14 @@
   "resolved" "https://registry.npmjs.org/vue-template-es2015-compiler/-/vue-template-es2015-compiler-1.9.1.tgz"
   "version" "1.9.1"
 
-"vue@^2.5.16", "vue@^2.6.10", "vue@^2.6.4":
+"vue-window-size@^0.6.2":
+  "integrity" "sha512-/mODjnC5xdZb0T0UlnUzYgOgxeaUVCEuBZkiD4jss2LkByA+208SA+MhMKvZFcMvej484+7mDjr2q9TNIRj+Dw=="
+  "resolved" "https://registry.npmjs.org/vue-window-size/-/vue-window-size-0.6.2.tgz"
+  "version" "0.6.2"
+  dependencies:
+    "window-resize-subject" "^1.4.2"
+
+"vue@^2.5.16", "vue@^2.6.10", "vue@^2.6.4", "vue@>=2.6":
   "integrity" "sha512-ImThpeNU9HbdZL3utgMCq0oiMzAkt1mcgy3/E6zWC/G6AaQoeuFdsl9nDhTDU3X1R6FK7nsIUuRACVcjI+A2GQ=="
   "resolved" "https://registry.npmjs.org/vue/-/vue-2.6.10.tgz"
   "version" "2.6.10"
@@ -9210,6 +9217,11 @@
   "integrity" "sha1-j1jgZW/KAK3IyGoriePNLWotXl4="
   "resolved" "https://registry.npmjs.org/win-fork/-/win-fork-1.1.1.tgz"
   "version" "1.1.1"
+
+"window-resize-subject@^1.4.2":
+  "integrity" "sha512-r+zXdtumr1+De51Lb3P561K+3t6PvEVXq+dTaEhikNY8Hj0UuzkYL3v9jo5TLpPaL7s9gkaX3Sb643HqYT7uSA=="
+  "resolved" "https://registry.npmjs.org/window-resize-subject/-/window-resize-subject-1.5.0.tgz"
+  "version" "1.5.0"
 
 "word-wrap@^1.2.3":
   "integrity" "sha512-Hz/mrNwitNRh/HUAtM/VT/5VH+ygD6DV7mYKZAtHOrbs8U7lvPS6xf7EJKMF0uW1KJCl0H701g3ZGus+muE5vQ=="
