@@ -2,6 +2,9 @@
     <v-container>
         <v-row no-gutters="no-gutters">
             <div id = "Content_Select_Btn"></div>
+            <div id = "div_Select_Label_Category">
+                <select id = "Select_Label_Category"></select>
+            </div>
             <div class="container_of_LabelProject" id="container-first" ref="container"></div>
             <v-dialog
                 max-width="290"
@@ -36,11 +39,6 @@
             <v-btn @click="download" color="#4B89DC">
                 <v-icon left="left">mdi-cloud-download</v-icon>
                 {{ $t("download") + "JSON" }}
-            </v-btn>
-            <v-btn @click="upload" color="#4B89DC">
-                <input @change="upload" class="upload" type="file">
-                <v-icon left="left">mdi-cloud-upload</v-icon>
-                {{ $t("upload") }}
             </v-btn>
         </v-row>
     </v-container>
@@ -80,26 +78,42 @@
             methods: {
                 makeContentSelectBtn(){
                     var _this = this;
-                    var Group_of_CS_Btn = document.createElement("div");
-                    Group_of_CS_Btn.style.width = "200%"
+                    var Group_of_Question_Btn = document.createElement("div");
+                    Group_of_Question_Btn.style.width = "200%"
                     for(let i = 0; i < questionJson.questionData.length; ++i){
-                        var CS_Btn = document.createElement("button");
-                        CS_Btn.textContent = questionJson.questionData[i].question;
-                        CS_Btn.className = "CS_Btn";
-                        CS_Btn.id = "Btn_No"+ i;
-                        CS_Btn.addEventListener("click", function(){
+                        var Question_Btn = document.createElement("button");
+                        Question_Btn.textContent = questionJson.questionData[i].question;
+                        Question_Btn.className = "Question_Btn";
+                        Question_Btn.id = "Btn_No"+ i;
+                        Question_Btn.addEventListener("click", function(){
                             _this.annotator.remove();
                             _this.annotator = _this.updateQuestionClickAnnotator(i);
                             _this.updateJSON();
                         });
-                        Group_of_CS_Btn.appendChild(CS_Btn);
+                        Group_of_Question_Btn.appendChild(Question_Btn);
                         if(i === 4){
-                            document.getElementById("Content_Select_Btn").appendChild(Group_of_CS_Btn);
-                            Group_of_CS_Btn = document.createElement("div");
-                        }
+                            document.getElementById("Content_Select_Btn").appendChild(Group_of_Question_Btn);
+                            Group_of_Question_Btn = document.createElement("div");
+                        } 
                     }
-                    document.getElementById("Content_Select_Btn").appendChild(Group_of_CS_Btn);
+                    document.getElementById("Content_Select_Btn").appendChild(Group_of_Question_Btn);
                 },
+                makeSelectLabelCategory(){
+                    var _this = this;
+                    for(let i = 0; i < _this.jsonData.labelCategories.length; ++i){
+                        var Box_LabelCategory = document.createElement("option");
+                        Box_LabelCategory.textContent = _this.jsonData.labelCategories[i].text;
+                        Box_LabelCategory.value = _this.jsonData.labelCategories[i].id;
+                        document.getElementById("Select_Label_Category").appendChild(Box_LabelCategory);
+                    }
+                    document.getElementById("Select_Label_Category").addEventListener("change", function(){
+                        //이를 대체 어찌한단 말인가....
+                        _this.annotator.remove();
+                        _this.annotator = _this.updateAnnotator();
+                        _this.updateJSON();
+                    });
+                },
+                /*
                 upload(e) {document
                     let reader = new FileReader();
                     reader.readAsText(e.target.files[0]);
@@ -126,12 +140,14 @@
                         .push("annotate")
                         .catch(_ => {});
                 },
+                */
                 updateJSON(): void {
                     for (var i = 0; i < defaultData.introductions.length; ++i) {
                         if(defaultData.introductions[i].id === this.annotator.store.json.id){
                             defaultData.introductions[i] = this.annotator.store.json
                         }
                     }
+                    JSON.stringify(defaultData, null, 4)
                     this.json = this.highlight(JSON.stringify(defaultData, null, 4));
                 },
                 addLabel(): void {
@@ -151,7 +167,10 @@
                     this.clickLabelCategories  = false;
                 },
                 updateQuestionClickAnnotator(point){
-                    const annotator = new Annotator(defaultData.introductions[point], this.$refs.container);
+                    this.jsonData = defaultData.introductions[point];
+                    //카테고리 값을 가지고온다.
+                    this.jsonData.labelCategories = defaultData.labelCategories;
+                    const annotator = new Annotator(this.jsonData, this.$refs.container);
                     annotator.on("textSelected", (startIndex, endIndex) => {
                         this.startIndex = startIndex;
                         this.endIndex = endIndex;
@@ -181,6 +200,7 @@
                     return annotator;   
                 },
                 //this.annotator.store.json
+                
                 updateAnnotator(): Annotator {
                     const annotator = new Annotator(this.annotator.store.json, this.$refs.container);
                     annotator.on("textSelected", (startIndex, endIndex) => {
@@ -276,6 +296,8 @@
             },
             created(): void {
                 this.jsonData = defaultData.introductions[0];
+                //카테고리 값을 가지고온다.
+                this.jsonData.labelCategories = defaultData.labelCategories;
                 if (this.annotator !== null) {
                     this
                         .annotator
@@ -297,6 +319,7 @@
             },
             mounted(): void {
                 this.makeContentSelectBtn();
+                this.makeSelectLabelCategory();
                 let _this = this;
                 if (this.jsonData !== null && this.jsonData.content) {
                     this.annotator = this.createAnnotator();
@@ -316,8 +339,16 @@
     }
 </style>
 <style>
+    #div_Select_Label_Category{
+        display: inline-block;
+        margin-top: 10%;
+    }
 
-    .CS_Btn{
+    #Select_Label_Category{
+        border: 1px solid black;
+    }
+
+    .Question_Btn{
         text-align: center;
         width: 25%;
         height: 50px;
@@ -331,6 +362,7 @@
 
     #Content_Select_Btn {
         transform: translateX(14%);
+        height: 50%;
     }
 
     .container_of_LabelProject > svg {
