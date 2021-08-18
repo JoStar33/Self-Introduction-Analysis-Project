@@ -52,6 +52,7 @@
         import {Annotator, Action} from "../index";
         import {LabelCategory} from "../Store/LabelCategory";
         import defaultData from "../assets/default.json";
+        import questionJson from "../assets/question.json";
 
         enum CategorySelectMode {
             Create,
@@ -67,7 +68,6 @@
                     selectedLabelCategory: null as LabelCategory.Entity | null,
                     clickLabelCategories: false as boolean,
                     showLabelCategoriesDialog: false as boolean,
-                    contentButtonData : ["1","2","3","4","5","6","7","8","9"],
                     json: "",
                     startIndex: -1,
                     endIndex: -1,
@@ -79,21 +79,21 @@
             },
             methods: {
                 makeContentSelectBtn(){
+                    var _this = this;
                     var Group_of_CS_Btn = document.createElement("div");
-                    for(let i = 1; i < 9; ++i){
+                    Group_of_CS_Btn.style.width = "200%"
+                    for(let i = 0; i < questionJson.questionData.length; ++i){
                         var CS_Btn = document.createElement("button");
-                        CS_Btn.textContent = this.contentButtonData[i];
+                        CS_Btn.textContent = questionJson.questionData[i].question;
+                        CS_Btn.className = "CS_Btn";
                         CS_Btn.id = "Btn_No"+ i;
-                        CS_Btn.style.width = "150px";
-                        CS_Btn.style.height = "50px";
-                        CS_Btn.style.float = "left";
-                        CS_Btn.style.marginRight = "2%";
-                        CS_Btn.style.marginBottom = "2%";
-                        CS_Btn.style.border = "1px solid black";
-                        CS_Btn.style.backgroundColor = "#d5d5f1";
-                        CS_Btn.style.borderRadius = "10%";
+                        CS_Btn.addEventListener("click", function(){
+                            _this.annotator.remove();
+                            _this.annotator = _this.updateQuestionClickAnnotator(i);
+                            _this.updateJSON();
+                        });
                         Group_of_CS_Btn.appendChild(CS_Btn);
-                        if(i === 5){
+                        if(i === 4){
                             document.getElementById("Content_Select_Btn").appendChild(Group_of_CS_Btn);
                             Group_of_CS_Btn = document.createElement("div");
                         }
@@ -127,7 +127,12 @@
                         .catch(_ => {});
                 },
                 updateJSON(): void {
-                    this.json = this.highlight(JSON.stringify(this.annotator.store.json, null, 4));
+                    for (var i = 0; i < defaultData.introductions.length; ++i) {
+                        if(defaultData.introductions[i].id === this.annotator.store.json.id){
+                            defaultData.introductions[i] = this.annotator.store.json
+                        }
+                    }
+                    this.json = this.highlight(JSON.stringify(defaultData, null, 4));
                 },
                 addLabel(): void {
                     if (this.categorySelectMode === CategorySelectMode.Update && this.clickLabelCategories) {
@@ -136,16 +141,44 @@
                             .applyAction(Action.Label.Update(this.selectedId, this.selectedLabelCategory));
                             this.updateJSON();
                     } else if(this.clickLabelCategories){
-                        //if (this.endIndex - this.startIndex < (this.annotator.width())/12) {
-                            this.annotator
-                            .applyAction(
-                                Action.Label.Create(this.selectedLabelCategory, this.startIndex, this.endIndex)
-                            );
-                            this.updateJSON();
-                       //}
+                        this.annotator
+                        .applyAction(
+                            Action.Label.Create(this.selectedLabelCategory, this.startIndex, this.endIndex)
+                        );
+                        this.updateJSON();
                     }
                     this.showLabelCategoriesDialog = false;
                     this.clickLabelCategories  = false;
+                },
+                updateQuestionClickAnnotator(point){
+                    const annotator = new Annotator(defaultData.introductions[point], this.$refs.container);
+                    annotator.on("textSelected", (startIndex, endIndex) => {
+                        this.startIndex = startIndex;
+                        this.endIndex = endIndex;
+                        this.categorySelectMode = CategorySelectMode.Create;
+                        this.showLabelCategoriesDialog = true;
+                    });
+
+                    annotator.on("buttonClicked", (labelId, event : MouseEvent) => {
+                        if (event.ctrlKey) {
+                            this.categorySelectMode = CategorySelectMode.Update;
+                            this.selectedId = labelId;
+                            this.showLabelCategoriesDialog = true;
+                        } else {
+                            annotator.applyAction(Action.Label.Delete(labelId));
+                        }
+                        this.updateJSON();
+                    });
+
+                    annotator.on("contentInput", (position, value) => {
+                        annotator.applyAction(Action.Content.Splice(position, 0, value));
+                        this.updateJSON();
+                    });
+                    annotator.on("contentDelete", (position, length) => {
+                        annotator.applyAction(Action.Content.Splice(position, length, ""));
+                        this.updateJSON();
+                    });
+                    return annotator;   
                 },
                 //this.annotator.store.json
                 updateAnnotator(): Annotator {
@@ -218,7 +251,7 @@
                     const eleLink = document.createElement("a");
                     eleLink.download = "data.json";
                     eleLink.style.display = "none";
-                    const blob = new Blob([JSON.stringify(this.annotator.store.json, null, 4)]);
+                    const blob = new Blob([JSON.stringify(defaultData, null, 4)]);
                     eleLink.href = URL.createObjectURL(blob);
                     document
                         .body
@@ -242,7 +275,7 @@
                 }
             },
             created(): void {
-                this.jsonData = defaultData;
+                this.jsonData = defaultData.introductions[0];
                 if (this.annotator !== null) {
                     this
                         .annotator
@@ -284,6 +317,18 @@
 </style>
 <style>
 
+    .CS_Btn{
+        text-align: center;
+        width: 25%;
+        height: 50px;
+        float: left;
+        margin-left: 2%;
+        margin-bottom: 2%;
+        border: 1px solid black;
+        /*background-color: #d5d5f1;*/
+        border-radius: 5%;
+    }
+
     #Content_Select_Btn {
         transform: translateX(14%);
     }
@@ -300,6 +345,15 @@
         pointer-events: all !important;
     }
 
+    div.container_of_LabelProject {
+        position: relative;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        /*display: flex;*/
+        width: 100%;
+        height: 400px;
+    }
+
     tspan {
         pointer-events: auto;
     }
@@ -309,14 +363,6 @@
         font-family: Verdana, serif;
     }
 
-    div.container_of_LabelProject {
-        position: relative;
-        overflow-y: scroll;
-        overflow-x: hidden;
-        /*display: flex;*/
-        width: 100%;
-        height: 400px;
-    }
     path {
         cursor: pointer !important;
         pointer-events: all;
