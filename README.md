@@ -9,7 +9,7 @@
 ![정보작성](https://user-images.githubusercontent.com/52379503/130021053-97e8db7f-6973-4422-b8e7-f45aaf7bc33f.png)
 
 
-![ezgif-2-7be6373dec88](https://user-images.githubusercontent.com/52379503/130409974-c4d48808-5ea7-44b1-876c-800045dcdc8c.gif)
+![ezgif-2-7e03fb5b7d45](https://user-images.githubusercontent.com/52379503/130410408-28a8d522-f126-4a07-9ff6-08a467414188.gif)
 
 
 
