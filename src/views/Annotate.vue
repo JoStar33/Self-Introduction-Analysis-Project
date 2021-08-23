@@ -2,40 +2,17 @@
     <v-container>
         <v-row no-gutters="no-gutters">
             <div id = "Content_Select_Btn"></div>
-            <div id = "div_Select_Label_Category">
-                <select id = "Select_Label_Category"></select>
+            <div id = "div_SelectBox">
+                <select id = "Select_Label_Category">
+                    <option value = "-1">전체보기</option>
+                </select>
             </div>
-            <div class="container_of_LabelProject" id="container-first" ref="container"></div>
-            <v-dialog
-                max-width="290"
-                persistent="persistent"
-                v-model="showLabelCategoriesDialog">
-                <v-card>
-                    <v-card-title>
-                        <span class="headline">라벨링</span>
-                    </v-card-title>
-                    <v-card-text>
-                        <v-radio-group v-model="selectedLabelCategory">
-                            <v-radio
-                                :key="category.id"
-                                :label="category.text"
-                                :value="category.id"
-                                v-for="category in this.labelCategories"
-                                @change="clickLabelCategories = true"></v-radio>
-                        </v-radio-group>
-                    </v-card-text>
-                    <v-card-actions>
-                        <v-btn @click="addLabel" color="#4B89DC">
-                            설정
-                        </v-btn>
-                        <v-btn @click="showLabelCategoriesDialog = false" color="#4B89DC">
-                            취소
-                        </v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-dialog>
+            <div id = "guide_Labelproject">
+                <p>#마음에 드는 문장을 드래그 해주세요!</p>
+            </div>
+            <div class = "container_of_LabelProject" id="container-first" ref="container"></div>
         </v-row>
-        <v-row align="end">
+        <v-row align = "end">
             <v-btn @click="download" color="#4B89DC">
                 <v-icon left="left">mdi-cloud-download</v-icon>
                 {{ $t("download") + "JSON" }}
@@ -56,17 +33,19 @@
             Create,
             Update
         }
-
         export default Vue.extend({
             components: {},
             data() {
-                return {
+                return{
+                    testJsonData: null,
                     jsonData: null,
+                    json: "",
                     annotator: null as Annotator | null,
                     selectedLabelCategory: null as LabelCategory.Entity | null,
-                    clickLabelCategories: false as boolean,
+                    clickLabelCategories: true as boolean,
                     showLabelCategoriesDialog: false as boolean,
-                    json: "",
+                    selectBoxMode: false as boolean,
+                    currentState: 0,
                     startIndex: -1,
                     endIndex: -1,
                     first: -1,
@@ -79,192 +58,174 @@
                 makeContentSelectBtn(){
                     var _this = this;
                     var Group_of_Question_Btn = document.createElement("div");
-                    Group_of_Question_Btn.style.width = "200%"
-                    for(let i = 0; i < questionJson.questionData.length; ++i){
+                    //Group_of_Question_Btn.style.width = "200%"
+                    for(const QJsonData of questionJson.questionData){
                         var Question_Btn = document.createElement("button");
-                        Question_Btn.textContent = questionJson.questionData[i].question;
+                        Question_Btn.textContent = QJsonData.question;
                         Question_Btn.className = "Question_Btn";
-                        Question_Btn.id = "Btn_No"+ i;
+                        Question_Btn.id = "Btn_No"+ QJsonData.id;
                         Question_Btn.addEventListener("click", function(){
+                            _this.currentState = QJsonData.id;
+                            _this.selectBoxMode = false;
                             _this.annotator.remove();
-                            _this.annotator = _this.updateQuestionClickAnnotator(i);
+                            _this.annotator = _this.updateAnnotator(2 ,QJsonData.id);
                             _this.updateJSON();
                         });
                         Group_of_Question_Btn.appendChild(Question_Btn);
-                        if(i === 4){
+                        if(QJsonData.id === 3){
                             document.getElementById("Content_Select_Btn").appendChild(Group_of_Question_Btn);
                             Group_of_Question_Btn = document.createElement("div");
                         } 
                     }
                     document.getElementById("Content_Select_Btn").appendChild(Group_of_Question_Btn);
                 },
-                makeSelectLabelCategory(){
+
+                makeSelectBoxOptions(){
                     var _this = this;
-                    for(let i = 0; i < _this.jsonData.labelCategories.length; ++i){
+                    for(let selectBoxOption of _this.jsonData.labelCategories){
                         var Box_LabelCategory = document.createElement("option");
-                        Box_LabelCategory.textContent = _this.jsonData.labelCategories[i].text;
-                        Box_LabelCategory.value = _this.jsonData.labelCategories[i].id;
+                        Box_LabelCategory.textContent ="평가자 " + selectBoxOption.text;
+                        Box_LabelCategory.value = String(selectBoxOption.id);
                         document.getElementById("Select_Label_Category").appendChild(Box_LabelCategory);
                     }
-                    document.getElementById("Select_Label_Category").addEventListener("change", function(){
-                        //이를 대체 어찌한단 말인가....
+                    const selectedOption = document.getElementsByTagName("select")[0];
+
+                    selectedOption.addEventListener("change", function(){
                         _this.annotator.remove();
-                        _this.annotator = _this.updateAnnotator();
-                        _this.updateJSON();
+                        _this.annotator = _this.updateAnnotator(3, parseInt(selectedOption.value)); //update Annotator SelectBox Option click Mode use.
                     });
                 },
-                /*
-                upload(e) {document
-                    let reader = new FileReader();
-                    reader.readAsText(e.target.files[0]);
-                    reader.onload = (event) => {
-                        window.setTimeout(() => {
-                            this.jsonData = JSON.parse(event.target.result.toString())
-                            if (this.annotator !== null) {
-                                this
-                                    .annotator
-                                    .remove();
+
+                pushLabel_When_SelectMode(Intro: any, IntroPoint: number): void {
+                    for (let newAddLabels of Intro.labels) {
+                        let checkpoint = false;
+                        for(let it of defaultData.introductions[IntroPoint].labels){
+                            if(it.id === newAddLabels.id && it.startIndex === newAddLabels.startIndex && it.endIndex === newAddLabels.endIndex){
+                                checkpoint = true;
                             }
-                            if (this.jsonData !== null && this.jsonData.content) {
-                                this.annotator = this.createAnnotator();
-                                this.updateJSON();
-                            }
-                            this
-                                .$eventbus
-                                .$emit("fileUploaded", JSON.parse(event.target.result.toString()));
-                            this.$forceUpdate();
-                        }, 10);
-                    };
-                    this
-                        .$router
-                        .push("annotate")
-                        .catch(_ => {});
-                },
-                */
-                updateJSON(): void {
-                    for (var i = 0; i < defaultData.introductions.length; ++i) {
-                        if(defaultData.introductions[i].id === this.annotator.store.json.id){
-                            defaultData.introductions[i] = this.annotator.store.json
+                        }
+                        if(checkpoint === false){
+                            defaultData.introductions[IntroPoint].labels.push(newAddLabels);
                         }
                     }
-                    JSON.stringify(defaultData, null, 4)
+                },
+
+                updateJSON(): void {
+                    if(this.selectBoxMode){
+                        for (var i = 0; i < defaultData.introductions.length; ++i) {
+                            if(defaultData.introductions[i].id === this.annotator.store.json.id){
+                                let currentAnnotator = this.annotator.store.json;
+                                this.pushLabel_When_SelectMode(currentAnnotator, i);
+                                break;
+                            }
+                        }
+                    }
+                    else{
+                        for (var i = 0; i < defaultData.introductions.length; ++i) {
+                            if(defaultData.introductions[i].id === this.annotator.store.json.id){
+                                defaultData.introductions[i] = this.annotator.store.json;
+                                break;
+                            }
+                        }
+                    }
+                    JSON.stringify(defaultData, null);
                     this.json = this.highlight(JSON.stringify(defaultData, null, 4));
                 },
-                addLabel(): void {
-                    if (this.categorySelectMode === CategorySelectMode.Update && this.clickLabelCategories) {
-                        this
-                            .annotator
-                            .applyAction(Action.Label.Update(this.selectedId, this.selectedLabelCategory));
-                            this.updateJSON();
-                    } else if(this.clickLabelCategories){
-                        this.annotator
-                        .applyAction(
-                            Action.Label.Create(this.selectedLabelCategory, this.startIndex, this.endIndex)
-                        );
-                        this.updateJSON();
+
+                updateJSON_for_SelectMode_LabelDelete(deleteLabelID: number): void{
+                    for (let i = 0; i < defaultData.introductions.length; ++i) {
+                        if(defaultData.introductions[i].id === this.annotator.store.json.id){ 
+                            defaultData.introductions[i].labels = defaultData.introductions[i].labels.filter(it => it.id !== deleteLabelID);
+                            break;
+                        }
                     }
-                    this.showLabelCategoriesDialog = false;
-                    this.clickLabelCategories  = false;
+                    JSON.stringify(defaultData, null, 4);
+                    this.json = this.highlight(JSON.stringify(defaultData, null, 4));
                 },
-                updateQuestionClickAnnotator(point){
-                    this.jsonData = defaultData.introductions[point];
-                    //카테고리 값을 가지고온다.
-                    this.jsonData.labelCategories = defaultData.labelCategories;
-                    const annotator = new Annotator(this.jsonData, this.$refs.container);
-                    annotator.on("textSelected", (startIndex, endIndex) => {
-                        this.startIndex = startIndex;
-                        this.endIndex = endIndex;
-                        this.categorySelectMode = CategorySelectMode.Create;
-                        this.showLabelCategoriesDialog = true;
-                    });
 
-                    annotator.on("buttonClicked", (labelId, event : MouseEvent) => {
-                        if (event.ctrlKey) {
-                            this.categorySelectMode = CategorySelectMode.Update;
-                            this.selectedId = labelId;
-                            this.showLabelCategoriesDialog = true;
-                        } else {
-                            annotator.applyAction(Action.Label.Delete(labelId));
-                        }
-                        this.updateJSON();
-                    });
-
-                    annotator.on("contentInput", (position, value) => {
-                        annotator.applyAction(Action.Content.Splice(position, 0, value));
-                        this.updateJSON();
-                    });
-                    annotator.on("contentDelete", (position, length) => {
-                        annotator.applyAction(Action.Content.Splice(position, length, ""));
-                        this.updateJSON();
-                    });
-                    return annotator;   
-                },
                 //this.annotator.store.json
-                
-                updateAnnotator(): Annotator {
-                    const annotator = new Annotator(this.annotator.store.json, this.$refs.container);
-                    annotator.on("textSelected", (startIndex, endIndex) => {
-                        this.startIndex = startIndex;
-                        this.endIndex = endIndex;
-                        this.categorySelectMode = CategorySelectMode.Create;
-                        this.showLabelCategoriesDialog = true;
-                    });
-
-                    annotator.on("buttonClicked", (labelId, event : MouseEvent) => {
-                        if (event.ctrlKey) {
-                            this.categorySelectMode = CategorySelectMode.Update;
-                            this.selectedId = labelId;
-                            this.showLabelCategoriesDialog = true;
-                        } else {
-                            annotator.applyAction(Action.Label.Delete(labelId));
+                updateAnnotator(Mode: number, point: number): Annotator {
+                    //Mode = 0 : create Annotator
+                    //Mode = 1 : normal update
+                    //Mode = 2 : Question Button Click. So, Show another Contents
+                    //Mode = 3 : Select Box Option Click. Show labels for options 
+                    let annotator: Annotator;
+                    if(Mode === 0){
+                        annotator = new Annotator(this.jsonData, this.$refs.container);
+                    }
+                    else if(Mode === 1){
+                        annotator = new Annotator(this.annotator.store.json, this.$refs.container);
+                    }
+                    else if(Mode === 2){
+                        this.jsonData = defaultData.introductions[point];
+                        this.jsonData.labelCategories = defaultData.labelCategories;
+                        annotator = new Annotator(defaultData.introductions[point], this.$refs.container);
+                    }
+                    else if(Mode === 3){
+                        if(point !== -1){
+                            this.selectBoxMode = true;
+                            let FindLabels = defaultData.introductions[this.currentState].labels.filter(element => element.categoryId !== point);
+                            annotator = new Annotator(defaultData.introductions[this.currentState], this.$refs.container);
+                            for(let deleteAction of FindLabels){
+                                annotator.applyAction(Action.Label.Delete(deleteAction.id));
+                            }
                         }
-                        this.updateJSON();
-                    });
-
-                    annotator.on("contentInput", (position, value) => {
-                        annotator.applyAction(Action.Content.Splice(position, 0, value));
-                        this.updateJSON();
-                    });
-                    annotator.on("contentDelete", (position, length) => {
-                        annotator.applyAction(Action.Content.Splice(position, length, ""));
-                        this.updateJSON();
-                    });
-                    return annotator;
-                },
-
-                createAnnotator(): Annotator {
-                    const annotator = new Annotator(this.jsonData, this.$refs.container);
-                    annotator.on("textSelected", (startIndex, endIndex) => {
-                        this.startIndex = startIndex;
-                        this.endIndex = endIndex;
-                        this.categorySelectMode = CategorySelectMode.Create;
-                        this.showLabelCategoriesDialog = true;
-                    });
-
-                    annotator.on("buttonClicked", (labelId, event : MouseEvent) => {
-                        if (event.ctrlKey) {
-                            this.categorySelectMode = CategorySelectMode.Update;
-                            this.selectedId = labelId;
-                            this.showLabelCategoriesDialog = true;
-                        } else {
-                            annotator.applyAction(Action.Label.Delete(labelId));
+                        else{
+                            this.selectBoxMode = false;
+                            annotator = new Annotator(defaultData.introductions[this.currentState], this.$refs.container);
                         }
-                        this.updateJSON();
-                    });
-
-                    annotator.on("contentInput", (position, value) => {
-                        annotator.applyAction(Action.Content.Splice(position, 0, value));
-                        this.updateJSON();
-                    });
-                    annotator.on("contentDelete", (position, length) => {
-                        annotator.applyAction(Action.Content.Splice(position, length, ""));
-                        this.updateJSON();
-                    });
+                    }
+                    this.settingEvent(annotator);
                     return annotator;
                 },
 
                 highlight(code : string): string {
                     return Prism.highlight(code, Prism.languages.javascript, "javascript");
+                },
+
+                settingEvent(annotator: Annotator): void{
+                    annotator.on("textSelected", (startIndex, endIndex) => {
+                        this.startIndex = startIndex;
+                        this.endIndex = endIndex;
+                        this.categorySelectMode = CategorySelectMode.Create;
+                        this.addLabel();
+                    });
+
+                    annotator.on("buttonClicked", (labelId, event : MouseEvent) => {
+                        if (event.ctrlKey) {
+                            this.categorySelectMode = CategorySelectMode.Update;
+                            this.selectedId = labelId;
+                            this.addLabel();
+                        } else {
+                            annotator.applyAction(Action.Label.Delete(labelId));
+                        }
+                        this.updateJSON_for_SelectMode_LabelDelete(labelId);
+                    });
+
+                    annotator.on("contentInput", (position, value) => {
+                        annotator.applyAction(Action.Content.Splice(position, 0, value));
+                    });
+
+                    annotator.on("contentDelete", (position, length) => {
+                        annotator.applyAction(Action.Content.Splice(position, length, ""));
+                    });
+                },
+
+                addLabel(): void {
+                    if (this.categorySelectMode === CategorySelectMode.Update && this.clickLabelCategories) {
+                        this
+                            .annotator
+                            .applyAction(Action.Label.Update(this.selectedId, defaultData.userInformation[0].id));
+                            this.updateJSON();
+                    } else if(this.clickLabelCategories){
+                        this.annotator
+                        .applyAction(
+                            Action.Label.Create(defaultData.userInformation[0].id, this.startIndex, this.endIndex)
+                        );
+                        this.updateJSON();
+                    }
+                    this.showLabelCategoriesDialog = false;
+                    this.clickLabelCategories = true;
                 },
 
                 download: function () {
@@ -304,7 +265,7 @@
                         .remove();
                 }
                 if (this.jsonData !== null && this.jsonData.content) {
-                    this.annotator = this.createAnnotator();
+                    this.annotator = this.updateAnnotator(0, 0);
                     this.updateJSON();
                 }
                 this
@@ -319,15 +280,15 @@
             },
             mounted(): void {
                 this.makeContentSelectBtn();
-                this.makeSelectLabelCategory();
+                this.makeSelectBoxOptions();
                 let _this = this;
                 if (this.jsonData !== null && this.jsonData.content) {
-                    this.annotator = this.createAnnotator();
+                    this.annotator = this.updateAnnotator(0, 0);
                     this.updateJSON();
                 }
                 window.addEventListener("resize", function(){    
                     _this.annotator.remove();
-                    _this.annotator = _this.updateAnnotator();
+                    _this.annotator = _this.updateAnnotator(1, 0);
                     _this.updateJSON();
                 });
             }
@@ -339,9 +300,28 @@
     }
 </style>
 <style>
-    #div_Select_Label_Category{
-        display: inline-block;
-        margin-top: 10%;
+
+    #guide_Labelproject{
+        background-color: #d5f1dc;
+        margin-bottom: 13px;
+        box-shadow: 10px 10px 10px gray;
+        margin-top: 3px;
+        border-radius: 30px;
+        width: 80%;
+    }
+    
+    #guide_Labelproject > p {
+            text-align: center;
+            font-style: inherit;
+            font-size: 15px;
+            font-weight: 700;
+    }
+
+    .no-gutters{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
     }
 
     #Select_Label_Category{
@@ -350,10 +330,10 @@
 
     .Question_Btn{
         text-align: center;
-        width: 25%;
+        width: 35%;
         height: 50px;
         float: left;
-        margin-left: 2%;
+        margin-left: 8%;
         margin-bottom: 2%;
         border: 1px solid black;
         /*background-color: #d5d5f1;*/
@@ -361,7 +341,6 @@
     }
 
     #Content_Select_Btn {
-        transform: translateX(14%);
         height: 50%;
     }
 
