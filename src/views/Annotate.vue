@@ -1,13 +1,13 @@
 <template>
     <v-container>
         <v-row no-gutters="no-gutters">
-            <div id = "Content_Select_Btn"></div>
-            <div id = "div_SelectBox">
+            <div id = "Introduction_Btn"></div>
+            <div id = "Select_Box">
                 <select id = "Select_Label_Category">
                     <option value = "-1">전체보기</option>
                 </select>
             </div>
-            <div id = "guide_Labelproject">
+            <div id = "guide_of_Labelproject">
                 <p>#마음에 드는 문장을 드래그 해주세요!</p>
             </div>
             <div class = "container_of_LabelProject" id="container-first" ref="container"></div>
@@ -55,15 +55,22 @@
                 };
             },
             methods: {
-                makeContentSelectBtn(){
-                    var _this = this;
-                    var Group_of_Question_Btn = document.createElement("div");
+                sortLabelID(){
+                    let newID;
+                    for(let Introduction of defaultData.introductions){
+                        newID = 0;
+                        for(let Label of Introduction.labels){
+                            Label.id = newID;
+                            newID++;
+                        }
+                    }
+                },
+                makeContentSelectBtns(){
+                    let _this = this;
                     //Group_of_Question_Btn.style.width = "200%"
                     for(const QJsonData of questionJson.questionData){
-                        var Question_Btn = document.createElement("button");
+                        let Question_Btn = document.createElement("button");
                         Question_Btn.textContent = QJsonData.question;
-                        Question_Btn.className = "Question_Btn";
-                        Question_Btn.id = "Btn_No"+ QJsonData.id;
                         Question_Btn.addEventListener("click", function(){
                             _this.currentState = QJsonData.id;
                             _this.selectBoxMode = false;
@@ -71,13 +78,8 @@
                             _this.annotator = _this.updateAnnotator(2 ,QJsonData.id);
                             _this.updateJSON();
                         });
-                        Group_of_Question_Btn.appendChild(Question_Btn);
-                        if(QJsonData.id === 3){
-                            document.getElementById("Content_Select_Btn").appendChild(Group_of_Question_Btn);
-                            Group_of_Question_Btn = document.createElement("div");
-                        } 
+                        document.getElementById("Introduction_Btn").appendChild(Question_Btn);
                     }
-                    document.getElementById("Content_Select_Btn").appendChild(Group_of_Question_Btn);
                 },
 
                 makeSelectBoxOptions(){
@@ -96,33 +98,29 @@
                     });
                 },
 
-                pushLabel_When_SelectMode(Intro: any, IntroPoint: number): void {
-                    for (let newAddLabels of Intro.labels) {
-                        let checkpoint = false;
-                        for(let it of defaultData.introductions[IntroPoint].labels){
-                            if(it.id === newAddLabels.id && it.startIndex === newAddLabels.startIndex && it.endIndex === newAddLabels.endIndex){
-                                checkpoint = true;
+                pushLabel_When_SelectBoxMode(SelectBox_Option_Introduction: any, IntroPoint: number): void {
+                    for (let SelectBox_Labels of SelectBox_Option_Introduction.labels) {
+                        let alreadyExistLabels = false;
+                        for(let JsonDataLabels of defaultData.introductions[IntroPoint].labels){
+                            if(JsonDataLabels.id === SelectBox_Labels.id && JsonDataLabels.startIndex === SelectBox_Labels.startIndex 
+                            && JsonDataLabels.endIndex === SelectBox_Labels.endIndex){
+                                alreadyExistLabels = true;
                             }
                         }
-                        if(checkpoint === false){
-                            defaultData.introductions[IntroPoint].labels.push(newAddLabels);
+                        if(alreadyExistLabels === false){
+                            defaultData.introductions[IntroPoint].labels.push(SelectBox_Labels);
                         }
                     }
                 },
 
                 updateJSON(): void {
-                    if(this.selectBoxMode){
-                        for (var i = 0; i < defaultData.introductions.length; ++i) {
-                            if(defaultData.introductions[i].id === this.annotator.store.json.id){
-                                let currentAnnotator = this.annotator.store.json;
-                                this.pushLabel_When_SelectMode(currentAnnotator, i);
+                    for (var i = 0; i <= defaultData.introductions.length; ++i) {
+                        if(defaultData.introductions[i].id === this.annotator.store.json.id){
+                            if(this.selectBoxMode){
+                                this.pushLabel_When_SelectBoxMode(this.annotator.store.json, i);
                                 break;
                             }
-                        }
-                    }
-                    else{
-                        for (var i = 0; i < defaultData.introductions.length; ++i) {
-                            if(defaultData.introductions[i].id === this.annotator.store.json.id){
+                            else{
                                 defaultData.introductions[i] = this.annotator.store.json;
                                 break;
                             }
@@ -132,14 +130,14 @@
                     this.json = this.highlight(JSON.stringify(defaultData, null, 4));
                 },
 
-                updateJSON_for_SelectMode_LabelDelete(deleteLabelID: number): void{
-                    for (let i = 0; i < defaultData.introductions.length; ++i) {
+                updateJSON_When_LabelDelete(deleteLabelID: number): void{
+                    for (let i = 0; i <= defaultData.introductions.length; ++i) {
                         if(defaultData.introductions[i].id === this.annotator.store.json.id){ 
                             defaultData.introductions[i].labels = defaultData.introductions[i].labels.filter(it => it.id !== deleteLabelID);
                             break;
                         }
                     }
-                    JSON.stringify(defaultData, null, 4);
+                    JSON.stringify(defaultData, null);
                     this.json = this.highlight(JSON.stringify(defaultData, null, 4));
                 },
 
@@ -152,14 +150,17 @@
                     let annotator: Annotator;
                     if(Mode === 0){
                         annotator = new Annotator(this.jsonData, this.$refs.container);
+                        this.settingEvent(annotator, false);
                     }
                     else if(Mode === 1){
                         annotator = new Annotator(this.annotator.store.json, this.$refs.container);
+                        this.settingEvent(annotator, false);
                     }
                     else if(Mode === 2){
                         this.jsonData = defaultData.introductions[point];
                         this.jsonData.labelCategories = defaultData.labelCategories;
                         annotator = new Annotator(defaultData.introductions[point], this.$refs.container);
+                        this.settingEvent(annotator, false);
                     }
                     else if(Mode === 3){
                         if(point !== -1){
@@ -169,13 +170,14 @@
                             for(let deleteAction of FindLabels){
                                 annotator.applyAction(Action.Label.Delete(deleteAction.id));
                             }
+                            this.settingEvent(annotator, true);
                         }
                         else{
                             this.selectBoxMode = false;
                             annotator = new Annotator(defaultData.introductions[this.currentState], this.$refs.container);
+                            this.settingEvent(annotator, false);
                         }
                     }
-                    this.settingEvent(annotator);
                     return annotator;
                 },
 
@@ -183,7 +185,7 @@
                     return Prism.highlight(code, Prism.languages.javascript, "javascript");
                 },
 
-                settingEvent(annotator: Annotator): void{
+                settingEvent(annotator: Annotator, selectBoxModeCheck: Boolean): void{
                     annotator.on("textSelected", (startIndex, endIndex) => {
                         this.startIndex = startIndex;
                         this.endIndex = endIndex;
@@ -199,7 +201,11 @@
                         } else {
                             annotator.applyAction(Action.Label.Delete(labelId));
                         }
-                        this.updateJSON_for_SelectMode_LabelDelete(labelId);
+                        if(!selectBoxModeCheck){
+                            this.updateJSON();
+                        } else{
+                            this.updateJSON_When_LabelDelete(labelId);
+                        }
                     });
 
                     annotator.on("contentInput", (position, value) => {
@@ -279,7 +285,8 @@
                     .catch(_ => {});
             },
             mounted(): void {
-                this.makeContentSelectBtn();
+                this.sortLabelID();
+                this.makeContentSelectBtns();
                 this.makeSelectBoxOptions();
                 let _this = this;
                 if (this.jsonData !== null && this.jsonData.content) {
@@ -301,22 +308,6 @@
 </style>
 <style>
 
-    #guide_Labelproject{
-        background-color: #d5f1dc;
-        margin-bottom: 13px;
-        box-shadow: 10px 10px 10px gray;
-        margin-top: 3px;
-        border-radius: 30px;
-        width: 80%;
-    }
-    
-    #guide_Labelproject > p {
-            text-align: center;
-            font-style: inherit;
-            font-size: 15px;
-            font-weight: 700;
-    }
-
     .no-gutters{
         display: flex;
         align-items: center;
@@ -324,24 +315,52 @@
         flex-direction: column;
     }
 
-    #Select_Label_Category{
-        border: 1px solid black;
+    #guide_of_Labelproject{
+        background-color: #d5f1dc;
+        margin-bottom: 13px;
+        box-shadow: 10px 10px 10px gray;
+        margin-top: 3px;
+        border-radius: 30px;
+        width: 80%;
     }
 
-    .Question_Btn{
+    #guide_of_Labelproject > p {
+        text-align: center;
+        font-style: inherit;
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    #Select_Box{
+        height: 50%;
+        border: 1px solid black;
+        font-family:'Nanumgothic';
+        border-radius:3px;
+        margin-bottom: 2%;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance : none;
+    }
+
+    #Introduction_Btn > button{
         text-align: center;
         width: 35%;
         height: 50px;
         float: left;
         margin-left: 8%;
         margin-bottom: 2%;
-        border: 1px solid black;
+        border: 3px solid black;
         /*background-color: #d5d5f1;*/
         border-radius: 5%;
     }
 
-    #Content_Select_Btn {
-        height: 50%;
+    .container_of_LabelProject {
+        position: relative;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        /*display: flex;*/
+        width: 100%;
+        height: 400px;
     }
 
     .container_of_LabelProject > svg {
@@ -356,22 +375,13 @@
         pointer-events: all !important;
     }
 
-    div.container_of_LabelProject {
-        position: relative;
-        overflow-y: scroll;
-        overflow-x: hidden;
-        /*display: flex;*/
-        width: 100%;
-        height: 400px;
+    .poplar-annotation-label {
+        font-size: 14px;
+        font-family: Verdana, serif;
     }
 
     tspan {
         pointer-events: auto;
-    }
-
-    .poplar-annotation-label {
-        font-size: 14px;
-        font-family: Verdana, serif;
     }
 
     path {

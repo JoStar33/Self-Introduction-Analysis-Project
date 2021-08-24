@@ -6,7 +6,6 @@ import {Config as TextSelectionHandlerConfig} from "./View/EventHandler/TextSele
 export interface ConfigInput {
     readonly contentClasses?: Array<string>;
     readonly labelClasses?: Array<string>;
-    readonly connectionClasses?: Array<string>;
     readonly labelPadding?: number;
     readonly lineHeight?: number;
     readonly topContextMargin?: number;
@@ -15,7 +14,6 @@ export interface ConfigInput {
     readonly labelWidthCalcMethod?: "max" | "label";
     readonly labelOpacity?: number;
     readonly selectingAreaStrip?: RegExp | null | undefined;
-    readonly unconnectedLineStyle?: "none" | "straight" | "curve";
     readonly contentEditable?: boolean;
 }
 

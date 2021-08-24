@@ -67,9 +67,6 @@ export default {
     this.Init_Of_title_Number_In_One_Line(title_Number_In_One_Line, title_Number_In_One_Line_Current);
     this.titleArray_Pusher(title_Array, title_Number_In_One_Line);
     this.Input_Into_timelineData(title_Array, title_of_Color, title_Number_In_One_Line, title_Number_In_One_Line_Current);
-    window.addEventListener("resize", function(){
-      //document.getElementById("Timeline").style.transform = "scale(0.75)";
-    });
   },
 
   methods: {
@@ -162,7 +159,7 @@ export default {
     }
     #Timeline > div{
         height: 150px;
-        overflow-y: hidden;
+        overflow-y: visible;
     }
     div#Timeline * rect{
         stroke-width: 0.5

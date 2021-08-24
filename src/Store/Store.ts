@@ -7,6 +7,7 @@ export interface Config extends LabelCategory.Config, Label.Config{
 }
 
 export interface JSON {
+    readonly id: Number;
     readonly content: string;
     readonly labelCategories: Array<LabelCategory.JSON>;
     readonly labels: Array<Label.JSON>;
@@ -17,6 +18,7 @@ export class Store extends EventEmitter {
     readonly labelRepo: Label.Repository;
     readonly config: Config;
     private _content: string = '';
+    private _id: Number;
 
     constructor(config: Config) {
         super();
@@ -29,8 +31,13 @@ export class Store extends EventEmitter {
         return this._content;
     }
 
+    get id() {
+        return this._id;
+    }
+
     set json(json: JSON) {
         //endsWith>>이걸로 끝난다면?
+        this._id = json.id;
         this._content = json.content.endsWith('\n') ? json.content : (json.content + '\n');
         LabelCategory.Factory.createAll(json.labelCategories, this.config).map(it => this.labelCategoryRepo.add(it));
         Label.Factory.createAll(json.labels, this).map(it => this.labelRepo.add(it));
@@ -48,6 +55,7 @@ export class Store extends EventEmitter {
 
     get json(): JSON {
         return {
+            id: this._id,
             content: this._content,
             labelCategories: this.labelCategoryRepo.json as Array<LabelCategory.JSON>,
             labels: this.labelRepo.json as Array<Label.JSON>

@@ -1,6 +1,12 @@
 map() 메서드는 배열 내의 모든 요소 각각에 대하여 주어진 함수를 호출한 결과를 모아 새로운 배열을 반환합니다.
+const tspans = this.lines.map(it => it.render()); 이런느낌?
 TypeScript에서 접두사 !는 식 유형에서 null와 undefined를 제거합니다.
 filter는 콜백함수로 지정된 조건에 맞는 요소를 다시 반환한다.
+    var newJson = testJson.filter(function(element){
+        console.log(element);
+        return element.name == "이건";
+    });
+이런 느낌으로 보면 좋을듯.
 
 getBoundingClientRect는 요소의 다양한 값을 가지는 함수인데 해당 값을 통해 요소의 다양한 값들을 반환하는 식이 아래이다.
 간단하게 예를들어서

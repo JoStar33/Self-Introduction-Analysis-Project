@@ -104,8 +104,6 @@
         .LabelProject {
             /*width: 48vw !important;*/
             width: 96%;
-            float: right;
-            text-align: center;
         }
         #devide-Part {
             border-style: dotted;
