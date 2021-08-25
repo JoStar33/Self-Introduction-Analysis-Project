@@ -2,11 +2,17 @@
     <v-container>
         <v-row no-gutters="no-gutters">
             <div id="Introduction_Btn"></div>
-            <v-select :items="selectItems" label="평가자" dense="dense" item-text= "text"
-            item-value="id" v-model="value" v-on:change="makeSelectBoxOptions()"></v-select>
-            <div id="guide_of_Labelproject">
-                <p>#마음에 드는 문장을 드래그 해주세요!</p>
-            </div>
+            <v-select
+                :items="selectItems"
+                label="평가자"
+                dense="dense"
+                item-text="text"
+                item-value="id"
+                v-model="value"
+                v-on:change="makeSelectBoxOptions()"></v-select>
+            <v-alert outlined="outlined" color="purple" style="width: 92%">
+                <div style="text-align: center">#마음에 드는 문장을 드래그 해주세요!</div>
+            </v-alert>
             <div class="container_of_LabelProject" id="container-first" ref="container"></div>
         </v-row>
         <v-row align="end">
@@ -17,7 +23,6 @@
         </v-row>
     </v-container>
 </template>
-
 <script lang="ts">
         import Vue from "vue";
         import Prism from "prismjs";
@@ -307,22 +312,6 @@
         flex-direction: column;
     }
 
-    #guide_of_Labelproject{
-        background-color: #d5f1dc;
-        margin-bottom: 13px;
-        box-shadow: 10px 10px 10px gray;
-        margin-top: 3px;
-        border-radius: 30px;
-        width: 80%;
-    }
-
-    #guide_of_Labelproject > p {
-        text-align: center;
-        font-style: inherit;
-        font-size: 15px;
-        font-weight: 700;
-    }
-
     #Select_Box{
         height: 50%;
         border: 1px solid black;
@@ -334,7 +323,7 @@
     }
 
     #Introduction_Btn > button{
-        background-color: #4B89DC;
+        background-color: #1976d2;
         text-align: center;
         width: 35%;
         height: 50px;

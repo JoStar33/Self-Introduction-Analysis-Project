@@ -22,7 +22,7 @@
     "vue-property-decorator": "^8.1.0",
     "vue-router": "^3.0.3",
     "vue-window-size": "^0.6.2",
-    "vuetify": "^2.0.0"
+    "vuetify": "^2.3.9"
   },
   "devDependencies": {
     "@kazupon/vue-i18n-loader": "^0.3.0",

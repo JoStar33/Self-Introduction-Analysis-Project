@@ -1,37 +1,38 @@
 <template app="app">
     <v-app>
-        <v-navigation-drawer>
-            <!-- -->
-        </v-navigation-drawer>
-
-        <v-app-bar>
-            <!-- -->
+        <v-app-bar height="110" app="app">
+            <v-img
+                src="./Image/ISU_Logo.png"
+                max-width="90"
+                max-height="90"
+                style="float: left"></v-img>
+            <h2>
+                &nbsp;&nbsp;이수 시스템
+            </h2>
         </v-app-bar>
-        <v-main>
-            <v-container>
-                <v-card class="top-Part">
-                    <v-img
-                        src="./assets/Mac.jpg"
-                        max-width="150"
-                        max-height="150"
-                        style="float: left"></v-img>
-                    <InfoApplicant id="Introduce-Part"></InfoApplicant>
+        <v-content fluid="fluid">
+            <v-card class="top-Part">
+                <v-img
+                    src="./Image/profile.jpg"
+                    max-width="150"
+                    max-height="150"
+                    style="float: left"></v-img>
+                <InfoApplicant id="Introduce-Part"></InfoApplicant>
+            </v-card>
+            <v-col>
+                <v-card class="left-Part">
+                    <v-alert
+                        class="Title"
+                        color="primary"
+                        dark="dark"
+                        icon="mdi-vuetify"
+                        border="left">
+                        경력 생애 주기
+                    </v-alert>
+                    <div id="TimelineBox">
+                        <TimeLine></TimeLine>
+                    </div>
                 </v-card>
-                <div class="left-Part">
-                    <v-card>
-                        <v-alert
-                            class="Title"
-                            color="primary"
-                            dark="dark"
-                            icon="mdi-vuetify"
-                            border="left">
-                            경력 생애 주기
-                        </v-alert>
-                        <div id="TimelineBox">
-                            <TimeLine></TimeLine>
-                        </div>
-                    </v-card>
-                </div>
                 <div class="right-Part">
                     <v-card>
                         <v-alert
@@ -51,13 +52,13 @@
                             dark="dark"
                             icon="mdi-vuetify"
                             border="left">
-                            
+                            지원자 자기소개서
                         </v-alert>
                         <Annotate class="LabelProject"></Annotate>
                     </v-card>
                 </div>
-            </v-container>
-        </v-main>
+            </v-col>
+        </v-content>
         <v-footer dark="dark" padless="padless">
             <v-card
                 flat="flat"
@@ -71,17 +72,15 @@
                         </v-icon>
                     </v-btn>
                 </v-card-text>
-
                 <v-card-text class="white--text pt-0">
-                    TEL : 02)590-6799    06575   
+                    <br>
+                    TEL : 02)590-6799 06575
                     <br>
                     서울특별시 서초구 사평대로 84 (반포동)
                     <br>
                     COPYRIGHT ISU SYSTEM. ALL RIGHTS RESERVED.
                 </v-card-text>
-
                 <v-divider></v-divider>
-
                 <v-card-text class="white--text">
                     {{ new Date().getFullYear() }}
                     —
@@ -91,7 +90,7 @@
         </v-footer>
     </v-app>
 </template>
-    <script lang="ts">
+<script lang="ts">
         import Vue from "vue";
         import Annotate from "@/views/Annotate.vue";
         import TimeLine from "@/views/TimeLine.vue";
@@ -183,26 +182,17 @@
         #Introduce-Part {
             display: left;
         }
-        .top-Part > img {
-            float: left;
-            width: 150px;
-            height: 100%;
-            border-radius: 30px;
-            margin: 3px;
-            padding-bottom: 6px;
-        }
         .top-Part {
             width: 100%;
             height: 150px;
-            margin-bottom: 50px;
+            margin-bottom: 10px;
         }
         .left-Part {
             width: 49.8%;
-            display: inline-block;
+            float: left;
             box-sizing: border-box;
         }
         .right-Part {
-            height: 100%;
             width: 49.8%;
             float: right;
             box-sizing: border-box;
@@ -211,7 +201,6 @@
             width: 96%;
             float: left;
             height: 130px;
-            box-sizing: border-box;
             overflow-x: hidden;
             overflow-y: hidden;
             margin-left: 2%;
@@ -225,6 +214,6 @@
             font-weight: 700;
         }
         .Title > i {
-            float: left;
+            float: left !important;
         }
     </style>

@@ -1,12 +1,11 @@
 <template>
     <GChart
-      id="Timeline"
-      type="Timeline"
-      :settings="{ packages: ['timeline'],
-      language: 'ko' }"
-      :data="timelineData"
-      :options="timelineOptions"
-    />
+        id="Timeline"
+        type="Timeline"
+        :settings="{ packages: ['timeline'],
+        language: 'ko' }"
+        :data="timelineData"
+        :options="timelineOptions"/>
 </template>
 <script>
 import { GChart } from "vue-google-charts";
@@ -163,10 +162,11 @@ export default {
         overflow-y: visible;
     }
     #Timeline * rect{
-        stroke-width: 0.5
-        !important;
-        stroke: black
-        !important;
+      font-family: "Noto Sans", sans-serif !important;
+      stroke-width: 1
+      !important;
+      stroke: black
+      !important;
     }
 </style>
 

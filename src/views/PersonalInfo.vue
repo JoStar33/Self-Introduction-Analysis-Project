@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <v-container>
       <div class = "Info Personal_Identification">
         <p v-for="users in hireInfoJson.users" :key="users.id + 'r'">
           {{ users.name }} {{ users.gender }} 만 {{users.age}}세 ({{ users.id }})
@@ -24,7 +24,7 @@
           지원직무 2순위: {{users.second_place}}
         </p>
       </div>
-    </div>
+    </v-container>
 </template>
 <script>
 import hireInfoJsonData from '../assets/hireInfo.json'
@@ -41,6 +41,12 @@ export default {
   methods:{
     handleInfoResize(){
       this.windowWidth = window.innerWidth;
+      if(this.windowWidth <= 500){
+        document.getElementById("WantPlace").style.display = "none"
+      }
+      else{
+        document.getElementById("WantPlace").style.display = "inline-block"
+      }
       if(this.windowWidth < 956){
         document.getElementById("WantPlace").style.marginLeft = "10%"
         document.getElementById("Introduce-Part").style.fontSize = "10px"
@@ -79,8 +85,6 @@ export default {
 }
 .Personal_Identification{
   margin-left: 2%;
-  margin-bottom: 2%;
-  margin-top: 1%;
 }
 #WantPlace{
   margin-top: 43px;

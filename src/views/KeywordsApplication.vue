@@ -1,9 +1,9 @@
 <template>
-    <div class = "KeywordsApplication">
+    <v-row class = "KeywordsApplication">
         <p id = "keyword" v-for="keyWords in hireInfoJson.keyWords" :key="keyWords.id">
             #{{keyWords.keyWord}}
         </p>
-    </div>
+    </v-row>
 </template>
 <script>
 import hireInfoJsonData from '../assets/hireInfo.json'
@@ -22,7 +22,8 @@ export default {
     font-weight: 600;
 }
 .KeywordsApplication{
-    margin-bottom: 7%;
+    text-align: center;
+    margin-bottom: 2%;
     margin-top: 2%;
 }
 </style>
