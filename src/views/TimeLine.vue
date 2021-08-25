@@ -40,7 +40,7 @@ export default {
       ,
       timelineOptions: {
         timeline: {
-          rowLabelStyle: { fontName: "Ariel"},
+          rowLabelStyle: { fontName: "Noto Sans KR"},
           colorByRowLabel: true,
           barLabelStyle: {
             fontSize: 10
@@ -49,7 +49,7 @@ export default {
         tooltip: {
           textStyle: 
           { 
-            fontName: "Ariel", 
+            fontName: "Noto Sans KR", 
             fontSize: 14
           } 
         }
@@ -149,11 +149,12 @@ export default {
 
 </script>
 <style>
+    @import url(//fonts.googleapis.com/earlyaccess/notosanskr.css);
     #Timeline {
       width: 100%;
       display: flex;
       font-weight: bold !important;
-      font-style: inherit !important;
+      font-family: "Noto Sans", sans-serif !important;
       transform: scale(0.65);
       transform-origin : 0% center;
     }
@@ -161,17 +162,12 @@ export default {
         height: 150px;
         overflow-y: visible;
     }
-    div#Timeline * rect{
+    #Timeline * rect{
         stroke-width: 0.5
         !important;
         stroke: black
         !important;
     }
-    /*
-    div#Timeline * svg{
-      transform: scale(0.75) !important;
-    }
-    */
 </style>
 
 

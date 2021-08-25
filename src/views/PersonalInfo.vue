@@ -1,7 +1,6 @@
 <template>
     <div>
       <div class = "Info Personal_Identification">
-        <br>
         <p v-for="users in hireInfoJson.users" :key="users.id + 'r'">
           {{ users.name }} {{ users.gender }} 만 {{users.age}}세 ({{ users.id }})
         </p>
@@ -80,6 +79,8 @@ export default {
 }
 .Personal_Identification{
   margin-left: 2%;
+  margin-bottom: 2%;
+  margin-top: 1%;
 }
 #WantPlace{
   margin-top: 43px;

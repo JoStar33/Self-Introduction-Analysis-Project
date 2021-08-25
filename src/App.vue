@@ -1,36 +1,96 @@
-<template app = "app">
-    <v-container>
-        <div class = "top-Part" id = "devide-Part">
-            <img src = "./assets/Mac.jpg">
-            <InfoApplicant id = "Introduce-Part"></InfoApplicant>
-        </div>
-        <div class = "left-Part" id = "devide-Part">
-            <div class = "Title">
-                <p>
-                    경력 생애 주기
-                </p>
-            </div>
-            <div id="TimelineBox">
-                <TimeLine></TimeLine>
-            </div>
-        </div>
-        <div class = "right-Part" id="devide-Part">
-            <div class = "Title">
-                <p>
-                    자기소개서 키워드
-                </p>
-            </div>
-            <KeywordsApplication></KeywordsApplication>
-            <div class = "Title">
-                <p>
-                    지원자 자기소개서
-                </p>
-            </div>
-            <Annotate class = "LabelProject"></Annotate>
-        </div>
-    </v-container>
-</template>
+<template app="app">
+    <v-app>
+        <v-navigation-drawer>
+            <!-- -->
+        </v-navigation-drawer>
 
+        <v-app-bar>
+            <!-- -->
+        </v-app-bar>
+        <v-main>
+            <v-container>
+                <v-card class="top-Part">
+                    <v-img
+                        src="./assets/Mac.jpg"
+                        max-width="150"
+                        max-height="150"
+                        style="float: left"></v-img>
+                    <InfoApplicant id="Introduce-Part"></InfoApplicant>
+                </v-card>
+                <div class="left-Part">
+                    <v-card>
+                        <v-alert
+                            class="Title"
+                            color="primary"
+                            dark="dark"
+                            icon="mdi-vuetify"
+                            border="left">
+                            경력 생애 주기
+                        </v-alert>
+                        <div id="TimelineBox">
+                            <TimeLine></TimeLine>
+                        </div>
+                    </v-card>
+                </div>
+                <div class="right-Part">
+                    <v-card>
+                        <v-alert
+                            class="Title"
+                            color="primary"
+                            dark="dark"
+                            icon="mdi-vuetify"
+                            border="left">
+                            자기소개서 키워드
+                        </v-alert>
+                        <KeywordsApplication></KeywordsApplication>
+                    </v-card>
+                    <v-card>
+                        <v-alert
+                            class="Title"
+                            color="primary"
+                            dark="dark"
+                            icon="mdi-vuetify"
+                            border="left">
+                            
+                        </v-alert>
+                        <Annotate class="LabelProject"></Annotate>
+                    </v-card>
+                </div>
+            </v-container>
+        </v-main>
+        <v-footer dark="dark" padless="padless">
+            <v-card
+                flat="flat"
+                tile="tile"
+                class="indigo lighten-1 white--text text-center"
+                width="100%">
+                <v-card-text>
+                    <v-btn v-for="icon in icons" :key="icon" class="mx-4 white--text" icon="icon">
+                        <v-icon size="24px">
+                            {{ icon }}
+                        </v-icon>
+                    </v-btn>
+                </v-card-text>
+
+                <v-card-text class="white--text pt-0">
+                    TEL : 02)590-6799    06575   
+                    <br>
+                    서울특별시 서초구 사평대로 84 (반포동)
+                    <br>
+                    COPYRIGHT ISU SYSTEM. ALL RIGHTS RESERVED.
+                </v-card-text>
+
+                <v-divider></v-divider>
+
+                <v-card-text class="white--text">
+                    {{ new Date().getFullYear() }}
+                    —
+                    <strong>ISU SYSTEM</strong>
+                </v-card-text>
+            </v-card>
+        </v-footer>
+    </v-app>
+</template>
     <script lang="ts">
         import Vue from "vue";
         import Annotate from "@/views/Annotate.vue";
@@ -39,6 +99,14 @@
         import KeywordsApplication from "@/views/KeywordsApplication.vue";
 
         export default Vue.extend({
+             data: () => ({
+                icons: [
+                'mdi-facebook',
+                'mdi-twitter',
+                'mdi-linkedin',
+                'mdi-instagram',
+                ],
+            }),
             components: {
                 TimeLine,
                 Annotate,
@@ -98,8 +166,9 @@
     </script>
 
     <style>
-        body {
-            min-width: 620px !important;
+        @import url(http://fonts.googleapis.com/earlyaccess/notosanskr.css); 
+        div{
+            font-family: 'Noto Sans KR', sans-serif;
         }
         .LabelProject {
             /*width: 48vw !important;*/
@@ -133,6 +202,7 @@
             box-sizing: border-box;
         }
         .right-Part {
+            height: 100%;
             width: 49.8%;
             float: right;
             box-sizing: border-box;
@@ -149,19 +219,12 @@
             margin-top: -2%;
         }
         .Title {
-            width: 96%;
-            background-color: #d5d5f1;
-            margin-top: 3px;
-            border-radius: 30px;
-            margin-bottom: 13px;
-            margin-left: 2%;
-            box-shadow: 10px 10px 10px gray;
-            overflow-y: hidden;
-        }
-        .Title > p {
-            text-align: center;
-            font-style: inherit;
+            height: 70%;
+            text-align: left;
             font-size: 15px;
             font-weight: 700;
+        }
+        .Title > i {
+            float: left;
         }
     </style>

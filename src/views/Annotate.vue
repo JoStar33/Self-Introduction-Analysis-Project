@@ -1,18 +1,15 @@
 <template>
     <v-container>
         <v-row no-gutters="no-gutters">
-            <div id = "Introduction_Btn"></div>
-            <div id = "Select_Box">
-                <select id = "Select_Label_Category">
-                    <option value = "-1">전체보기</option>
-                </select>
-            </div>
-            <div id = "guide_of_Labelproject">
+            <div id="Introduction_Btn"></div>
+            <v-select :items="selectItems" label="평가자" dense="dense" item-text= "text"
+            item-value="id" v-model="value" v-on:change="makeSelectBoxOptions()"></v-select>
+            <div id="guide_of_Labelproject">
                 <p>#마음에 드는 문장을 드래그 해주세요!</p>
             </div>
-            <div class = "container_of_LabelProject" id="container-first" ref="container"></div>
+            <div class="container_of_LabelProject" id="container-first" ref="container"></div>
         </v-row>
-        <v-row align = "end">
+        <v-row align="end">
             <v-btn @click="download" color="#4B89DC">
                 <v-icon left="left">mdi-cloud-download</v-icon>
                 {{ $t("download") + "JSON" }}
@@ -37,6 +34,8 @@
             components: {},
             data() {
                 return{
+                    value: null,
+                    selectItems: defaultData.labelCategories,
                     testJsonData: null,
                     jsonData: null,
                     json: "",
@@ -84,18 +83,8 @@
 
                 makeSelectBoxOptions(){
                     var _this = this;
-                    for(let selectBoxOption of _this.jsonData.labelCategories){
-                        var Box_LabelCategory = document.createElement("option");
-                        Box_LabelCategory.textContent ="평가자 " + selectBoxOption.text;
-                        Box_LabelCategory.value = String(selectBoxOption.id);
-                        document.getElementById("Select_Label_Category").appendChild(Box_LabelCategory);
-                    }
-                    const selectedOption = document.getElementsByTagName("select")[0];
-
-                    selectedOption.addEventListener("change", function(){
-                        _this.annotator.remove();
-                        _this.annotator = _this.updateAnnotator(3, parseInt(selectedOption.value)); //update Annotator SelectBox Option click Mode use.
-                    });
+                    _this.annotator.remove();
+                    _this.annotator = _this.updateAnnotator(3, parseInt(this.value)); //update Annotator SelectBox Option click Mode use.
                 },
 
                 pushLabel_When_SelectBoxMode(SelectBox_Option_Introduction: any, IntroPoint: number): void {
@@ -287,7 +276,6 @@
             mounted(): void {
                 this.sortLabelID();
                 this.makeContentSelectBtns();
-                this.makeSelectBoxOptions();
                 let _this = this;
                 if (this.jsonData !== null && this.jsonData.content) {
                     this.annotator = this.updateAnnotator(0, 0);
@@ -298,6 +286,11 @@
                     _this.annotator = _this.updateAnnotator(1, 0);
                     _this.updateJSON();
                 });
+                window.addEventListener("load", function(){
+                    _this.annotator.remove();
+                    _this.annotator = _this.updateAnnotator(1, 0);
+                    _this.updateJSON();
+                })
             }
         });
 </script>
@@ -307,7 +300,6 @@
     }
 </style>
 <style>
-
     .no-gutters{
         display: flex;
         align-items: center;
@@ -334,7 +326,6 @@
     #Select_Box{
         height: 50%;
         border: 1px solid black;
-        font-family:'Nanumgothic';
         border-radius:3px;
         margin-bottom: 2%;
         -webkit-appearance: none;
@@ -343,17 +334,19 @@
     }
 
     #Introduction_Btn > button{
+        background-color: #4B89DC;
         text-align: center;
         width: 35%;
         height: 50px;
         float: left;
         margin-left: 8%;
         margin-bottom: 2%;
-        border: 3px solid black;
+        font-size: 13px;
+        font-weight: 700;
         /*background-color: #d5d5f1;*/
-        border-radius: 5%;
+        border-radius: 10px;
     }
-
+    
     .container_of_LabelProject {
         position: relative;
         overflow-y: scroll;
@@ -373,11 +366,6 @@
 
     .container_of_LabelProject > g {
         pointer-events: all !important;
-    }
-
-    .poplar-annotation-label {
-        font-size: 14px;
-        font-family: Verdana, serif;
     }
 
     tspan {

@@ -191,7 +191,13 @@
         }
     ],            
     "labelCategories": [
+
         {
+            "id": -1,
+            "text": "전체보기",
+            "color": "",
+            "borderColor": ""
+        }, {
             "id": 0,
             "text": "황호세",
             "color": "#eac0a2",
