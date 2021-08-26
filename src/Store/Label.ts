@@ -2,6 +2,7 @@ import {Base} from "../Infrastructure/Repository";
 import {Store} from "./Store";
 import {LabelCategory} from "./LabelCategory";
 
+//라벨의 정보를 저장하는 ts파일.
 export namespace Label {
     export interface JSON {
         readonly id: number;

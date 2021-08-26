@@ -1,7 +1,10 @@
+<!--5page 2번 자기소개서 요약-->
 <template>
     <v-container>
         <v-row no-gutters="no-gutters">
+            <!--5page 2-1번 질문 키워드 버튼-->
             <div id="Introduction_Btn"></div>
+            <!--7page 2번 셀렉트 박스: 타인 평가-->
             <v-select
                 :items="selectItems"
                 label="평가자"
@@ -10,12 +13,15 @@
                 item-value="id"
                 v-model="value"
                 v-on:change="makeSelectBoxOptions()"></v-select>
+            <!--5page 2-5번 가이드 텍스트-->
             <v-alert outlined="outlined" color="purple" style="width: 92%">
                 <div style="text-align: center">#마음에 드는 문장을 드래그 해주세요!</div>
             </v-alert>
+            <!--5page 2-3번 원문-->
             <div class="container_of_LabelProject" id="container-first" ref="container"></div>
         </v-row>
         <v-row align="end">
+            <!--5page 2-6번 저장 버튼-->
             <v-btn @click="download" color="#4B89DC">
                 <v-icon left="left">mdi-cloud-download</v-icon>
                 {{ $t("download") + "JSON" }}
@@ -72,10 +78,10 @@
                         }
                     }
                 },
+                //5page 2-1번 질문 키워드 버튼들을 생성시켜준다.
                 //다른 자기소개서 조회를 돕는 버튼을 형성하는 함수.
                 makeContentSelectBtns(){
                     let _this = this;
-                    //Group_of_Question_Btn.style.width = "200%"
                     for(const QJsonData of questionJson.questionData){
                         let Question_Btn = document.createElement("button");
                         Question_Btn.textContent = QJsonData.question;
@@ -90,7 +96,8 @@
                     }
                 },
 
-                //생성된 SelectBox에서 Option을 고르게 되면 Option이 가지고 있는 id값을 가지고와서 updateAnnotator에 전달해주는 함수.
+                //7page 2번 셀렉트 박스: 타인 평가부분에서 
+                //생성된 SelectBox내에 Option을 고르게 되면 Option이 가지고 있는 id값을 가지고와서 updateAnnotator에 전달해주는 함수.
                 makeSelectBoxOptions(){
                     var _this = this;
                     _this.annotator.remove();
@@ -144,8 +151,9 @@
                     this.json = this.highlight(JSON.stringify(defaultData, null, 4));
                 },
 
-                //this.annotator.store.json
-                updateAnnotator(Mode: number, point: number): Annotator {
+                updateAnnotator(Mode: number, point: number): Annotator { 
+                    //Mode 변수는 값에 따라서 업데이트 방식을 바꿔준다.
+                    //point 변수는 Mode가 2일때는 몇번째 자기소개서의 값인지를 나타내고 Mode가 3일때는 SelectBox의 몇번째 값인지에 대한 정보를 가진다.
                     //Mode = 0 : create Annotator
                     //Mode = 1 : normal update(평상시 상황에서 update를 할때.)
                     //Mode = 2 : Question Button Click. Show another Contents
@@ -196,6 +204,7 @@
 
                 //Annotator를 업데이트하거나 새로 등록할때 이벤트를 생성해주는 함수.
                 settingEvent(annotator: Annotator, selectBoxModeCheck: Boolean): void{
+                    //텍스트를 드레그했을 경우.
                     annotator.on("textSelected", (startIndex, endIndex) => {
                         this.startIndex = startIndex;
                         this.endIndex = endIndex;
@@ -203,6 +212,7 @@
                         this.addLabel();
                     });
 
+                    //삭제버튼을 눌렀을 경우
                     annotator.on("buttonClicked", (labelId, event : MouseEvent) => {
                         if (event.ctrlKey) {
                             this.categorySelectMode = CategorySelectMode.Update;
@@ -251,6 +261,7 @@
                     this.clickLabelCategories = true;
                 },
 
+                //제이슨 데이터를 다운로드 하는 함수.
                 download: function () {
                     const eleLink = document.createElement("a");
                     eleLink.download = "data.json";
@@ -305,6 +316,7 @@
                 this.sortLabelID();
                 this.makeContentSelectBtns();
                 let _this = this;
+                //최초로 Annotator를 그려주는 부분.
                 if (this.jsonData !== null && this.jsonData.content) {
                     this.annotator = this.updateAnnotator(0, 0);
                     this.updateJSON();
@@ -315,13 +327,13 @@
                     _this.annotator = _this.updateAnnotator(1, 0);
                     _this.updateJSON();
                 });
-                //load 이벤트를 등록한 이유는 fontFamily를 app에서 지정해줄때 Annotator에서 font의 변화가 생기지만 그 변화로 인해 라벨링을 하면 기존의 font크기에 맞춰서
+                //load 이벤트를 등록한 이유는 fontFamily를 app에서 지정해줄때 Annotator에서 font의 변화가 생기지만 그 변화로 인해 만약 라벨링을 하면 기존의 font크기에 맞춰서
                 //라벨링이 그려지는 현상이 있기때문에 이를 방지하고자 다시한번더 Annotator를 그려주는 소스이다.
                 window.addEventListener("load", function(){
                     _this.annotator.remove();
                     _this.annotator = _this.updateAnnotator(1, 0);
                     _this.updateJSON();
-                })
+                });
             }
         });
 </script>
