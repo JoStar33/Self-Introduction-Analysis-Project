@@ -19,8 +19,6 @@ export default {
 
   data() {
     return {
-      maxYear: 0,
-      minYear: 19711121,
       startYear: null,
       startMonth: null,
       startDate: null,
@@ -59,7 +57,7 @@ export default {
   mounted: function () {
     //변수 선언부
     let title_Array = []; //몇번째 줄에 타이틀이 무엇인지를 정의(커리어 종류)
-    let title_of_Color = [[255, 0, 0], [51, 102, 255], [253, 220, 0]];
+    let title_of_Color = [[255, 0, 0], [51, 102, 255], [253, 220, 0]]; //색의 rgb값 정보를 담는 배열.
     let title_Number_In_One_Line = []; //하나의 라인에 몇개의 라벨이 들어있는지를 판별.
     let title_Number_In_One_Line_Current = []; //현재 이라인에 라벨의 위치
 
@@ -69,6 +67,7 @@ export default {
   },
 
   methods: {
+    //가로열 몇번째 값인지를 가지는 배열.
     Init_Of_title_Number_In_One_Line(title_Number_In_One_Line, title_Number_In_One_Line_Current){
       for(let i = 0; i < timelineJson.items.length; ++i){
         title_Number_In_One_Line[i] = 0;
@@ -76,6 +75,7 @@ export default {
       }
     },
 
+    //세로열에 고유값이 어떤게 있는지 계산하고 이를 배열의 형태로 가지는 함수.
     titleArray_Pusher(title_Array, title_Number_In_One_Line){
       for(const timeItems of timelineJson.items){
         let title = String(timeItems.title);
@@ -96,6 +96,7 @@ export default {
         let title = String(timeItems.title);
         ++title_Number_In_One_Line_Current[titleArray.indexOf(title)];
 
+        //최종적으로는 timelineData에 계산해준 값들을 배열로 만들고 넣어준다.
         this.timelineData.push(
           [ timeItems.title
           , timeItems.labelname
@@ -107,6 +108,8 @@ export default {
       this.set_MinWidth_And_MaxWidth();
     },
 
+    //최대 최저 길이를 지정해주는 함수. google charts 라이브러리를 사용하기 때문에 구글차트의 크기가 줄었을경우 연도들이 간소화돼서 보이는 현상을 막고자
+    //해당함수를 만들게 되었음.
     set_MinWidth_And_MaxWidth(){
       document.getElementById("Timeline").style.minWidth = String(45 + 50 * (this.maxYear - (this.minYear - 1))) + "px";
       document.getElementById("Timeline").style.width = String(45 + 50 * (this.maxYear - (this.minYear - 1))) + "px";
@@ -124,6 +127,7 @@ export default {
         return [minYear, maxYear];
     },
 
+    //RGB값에따라 시간이 지날수록 점점 타임라인바의 색이 연해지도록 하는 함수.
     RGB_Calculater([Red, Green, Blue], title_Number_In_One_Line, title_Number_In_One_Line_Current){
       if(Red === 255){
         Red = parseInt((2 * Red / 5) + ((3 * Red / 5) / title_Number_In_One_Line) * title_Number_In_One_Line_Current)
@@ -137,6 +141,7 @@ export default {
       return "rgb("+ Red +","+ Green +","+ Blue +")";
     },
 
+    //연도, 달, 날짜를 계산해주는 함수.
     Make_YearMonthDate(timelineNumber){
       let Year = parseInt(timelineNumber / 10000);
       let Month = parseInt((timelineNumber % 10000) / 100);

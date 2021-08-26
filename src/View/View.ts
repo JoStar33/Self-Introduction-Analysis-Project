@@ -136,6 +136,7 @@ export class View {
     }
 
     private registerEventHandlers() {
+        //view에 이벤트를 설정해주는 함수
         this.textElement.onmouseup = (e) => {
             if (window.getSelection()!.type === "Range") {
                 this.root.textSelectionHandler.textSelected();
@@ -166,6 +167,7 @@ export class View {
     }
 
 
+    //길게 줄을 넘기도록 라벨링을 하였을경우 동작하는 함수.
     private makeDivideLongLabel(startInLineIndex: number, endInLineIndex: number, label: Label.Entity) {
         let checkAboutFirstLabel = false;
         for(let i = startInLineIndex; i < endInLineIndex; i++ ){
@@ -179,7 +181,6 @@ export class View {
             else{
                 LongLabel = new Label.Entity(label.id, label.categoryId, this.lines[i].startIndex, this.lines[i].endIndex, this.store);
             }
-            //소스가 다소 불안정적임. 수정이 필요함. 
             //Repository.add 내부함수에 수정을 가했기 때문에 동작하는 소스이다.
             const line = this.lines[i];
             const labelView = new LabelView.Entity(LongLabel, line.topContext, this.config, checkAboutFirstLabel);
@@ -199,9 +200,10 @@ export class View {
 
     //라벨링을 할때 동작하는 메소드가 이녀석이다.
     private onLabelCreated(label: Label.Entity) {
+        //findRangeInLines를 통해 시작하는 라인 끝나는 라인을 찾아낸다.
         let [startInLineIndex, endInLineIndex] = this.findRangeInLines(label.startIndex, label.endIndex);
         //startInLineIndex는 라벨링 시작라인 endInLineIndex는 라벨링이 끝나는 라인.
-        //in one line
+        //in one line. 한줄내에서 끝나는 라벨링의 경우 동작하는 소스.
         if (endInLineIndex === startInLineIndex + 1) {
             const line = this.lines[startInLineIndex];
             const labelView = new LabelView.Entity(label, line.topContext, this.config, false);
@@ -221,6 +223,7 @@ export class View {
         this.svgElement.style.height = this.height.toString() + 'px';
     }
 
+    //시작라인과 끝나는 라인을 찾아주는 소스.
     private findRangeInLines(startIndex: number, endIndex: number) {
         let startInLineIndex: number = 0;
         let endInLineIndex: number = 0;

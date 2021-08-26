@@ -57,6 +57,7 @@ export default {
         document.getElementById("Introduce-Part").style.fontSize = "14px"
       }
     },
+    //핸드폰 번호를 형식에 맞춰서 반환해주는 함수.
     phoneFomatter(num, type){
       var formatNum = '';
       if(num.length === 11){

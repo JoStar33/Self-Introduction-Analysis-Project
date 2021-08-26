@@ -117,6 +117,7 @@ export namespace LabelView {
             this.svgElement.remove();
         }
 
+        //하이라이트된 라벨을 그려주는 함수
         private createHighLightElement() {
             const highLightElement = document.createElementNS(SVGNS, 'rect') as SVGRectElement;
             const color = this.store.category.color;
@@ -126,7 +127,7 @@ export namespace LabelView {
             return highLightElement;
         }
 
-        //삭제버튼 태그
+        //삭제버튼을 그려주는 함수
         private createAnnotationBtnElement(){
             const annotationBtnElement = document.createElementNS(SVGNS, 'svg') as SVGElement;
             const PathElement = document.createElementNS(SVGNS, 'path') as SVGPathElement;
@@ -169,6 +170,7 @@ export namespace LabelView {
             return this.entities.get(key)!;
         }
 
+        //getAll을 만든 이유는, Label이 줄이 길어서 넘겼을 경우, 넘긴 라벨들까지 가지고 오기 위해서 만들게 되었음.
         getAll(key: number): Array<LabelView.Entity> {
             let result = [];
             //이부분이 다소 문제...사이즈를 엄청 늘리긴했는디...아무튼 문제.
