@@ -1,13 +1,15 @@
-<!--요구사항 3page 2-2 내용-->
+<!--요구사항 3page 2-2 지원자 기본정보-->
 <template>
     <v-container>
       <div class = "Info Personal_Identification">
+        <!--이름, 성별, 나이, id값을 보여주는 부분.-->
         <p v-for="users in hireInfoJson.users" :key="users.id + 'r'">
           {{ users.name }} {{ users.gender }} 만 {{users.age}}세 ({{ users.id }})
         </p>
         <br>
         <br>
         <br>
+        <!--핸드폰 번호와 메일 주소를 보여주는 부분.-->
         <div class = "Info" id = "TelAndAdd">     
           <p id = "TelAndAdd" v-for="users in hireInfoJson.users" :key="users.id +'l'">
             T. {{ phoneFomatter(users.phoneNumber)}}
@@ -17,6 +19,7 @@
           </p>
         </div>
       </div>
+      <!--지원직무를 보여주는 부분.-->
       <div class = "Info" id = "WantPlace">
         <p v-for="users in hireInfoJson.users" :key="users.id + 'q'">
           지원직무 1순위: {{users.first_place}}

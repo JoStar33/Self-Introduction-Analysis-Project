@@ -7,6 +7,7 @@ import {ConfigInput, parseInput} from "./Config";
 import {TextSelectionHandler} from "./View/EventHandler/TextSelectionHandler";
 import {IAction} from "./Action/IAction";
 
+//Annotate에 Store, View, TextSelectionHandler등의 파일들을 연결해주는 함수.
 export class Annotator extends EventEmitter {
     readonly store: Store;
     readonly view: View;

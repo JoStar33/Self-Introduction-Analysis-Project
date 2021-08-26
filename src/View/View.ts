@@ -19,7 +19,7 @@ export interface Config extends LabelView.Config {
     readonly contentEditable: boolean;
 }
 
-
+//Annotator 전체를 그려주는 역할을 하는 파일. 
 export class View {
     readonly contentFont: Font.ValueObject;
     readonly labelFont: Font.ValueObject;
@@ -86,12 +86,14 @@ export class View {
         //this.store.labelRepo는 라벨 저장소에 저장된 값을 가져온다는 의미.
         let labelViews = null;
         let saveLabel = Array;
-        let checkFirstArray = new Array<boolean>();
+        let checkFirstArray = new Array<boolean>(); //라인을 넘겼나 안넘겼나를 확인하기 위한 변수이다. 추후 labelView에서 삭제버튼을 만들건지 안만들건지를 결정하기 위해서 필요한 변수.
         let saveLabelPoint = 0;
+        //초기화 해주는 반복문
         for(let makesaveLabel = 0; makesaveLabel < this.store.labelRepo.length; ++makesaveLabel){
             saveLabel[makesaveLabel] = null;
         }
 
+        //초기화 해주는 반복문
         for(let save_push = 0; save_push < this.store.labelRepo.length; ++save_push){
             checkFirstArray[save_push] = false;
         }
@@ -107,8 +109,11 @@ export class View {
                 }
             }
             for(const entityLabels of labels){
+                //라인의 끝값을 넘겨서 라벨이 들어가는 경우
                 if(entityLabels.endIndex > entityLines.endIndex){
+                    //라벨을 나눠서 다시 넣어주는 과정을 거쳐야하기때문에 나눈 라벨의 정보를 저장한다. 라인의 끝값부터 시작하도록 하고 라벨의 끝값으로 끝나도록 구성한다.
                     saveLabel[saveLabelPoint] = new Label.Entity(entityLabels.id, entityLabels.categoryId, entityLines.endIndex, entityLabels.endIndex, this.store);
+                    //자른 라벨을 넣어준다. 라인의 끝값으로 endIndex를 가지도록 한다.
                     labelViews = new LabelView.Entity(new Label.Entity(entityLabels.id, entityLabels.categoryId, entityLabels.startIndex, entityLines.endIndex, this.store),
                     entityLines.topContext, this.config, checkFirstArray[entityLabels.id]);
                     checkFirstArray[entityLabels.id] = true;
@@ -148,7 +153,6 @@ export class View {
         this.store.labelRepo.on('created', this.onLabelCreated.bind(this));
         this.store.labelRepo.on('removed', (label: Label.Entity) => {
             //remove를 하되, 라인에 매치가 되는 값들을 삭제하도록. 아이디가 일치하는 값이 있다면.
-            //제대로 돌아간다!!!!!!!!!!!!!!!!!!!!!!!!나이스!!!!!!!!!!
             //삭제가 성공적으로 적용!
             let viewEntity = this.labelViewRepository.getAll(label.id!);
             for (const entity of viewEntity) {
@@ -195,8 +199,8 @@ export class View {
         }
     }
 
-    //라벨링을 할때 동작하는 메소드가 이녀석이다.
-    private onLabelCreated(label: Label.Entity) {
+    //라벨링을 할때 동작하는 메소드가 이녀석이다. 주의! 이녀석은 어디까지나 라벨링을 "할때"이지 초기에 웹페이지를 열때 사용되는 함수는 아니다.
+        private onLabelCreated(label: Label.Entity) {
         //findRangeInLines를 통해 시작하는 라인 끝나는 라인을 찾아낸다.
         let [startInLineIndex, endInLineIndex] = this.findRangeInLines(label.startIndex, label.endIndex);
         //startInLineIndex는 라벨링 시작라인 endInLineIndex는 라벨링이 끝나는 라인.

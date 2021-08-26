@@ -8,6 +8,7 @@ export interface Config extends LabelCategory.Config, Label.Config{
 }
 
 export interface JSON {
+    //JSON형태를 구성
     readonly id: Number;
     readonly content: string;
     readonly labelCategories: Array<LabelCategory.JSON>;
@@ -28,6 +29,7 @@ export class Store extends EventEmitter {
         this.labelRepo = new Label.Repository(config);
     }
 
+    //문장 내용을 가지고오는 함수.
     get content() {
         return this._content;
     }

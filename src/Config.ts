@@ -17,7 +17,6 @@ export interface ConfigInput {
     readonly contentEditable?: boolean;
 }
 
-//config=구성을 의미한다는거 참고
 export interface Config extends ViewConfig, StoreConfig, TextSelectionHandlerConfig{
 }
 

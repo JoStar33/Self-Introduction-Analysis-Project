@@ -19,7 +19,7 @@ export namespace Line {
         private readonly config: Config;
 
         constructor(
-            //라인의 시작과 끝, start, end(아직까지는 추측.)
+            //라인의 시작과 끝, start, end
             startIndex: number,
             endIndex: number,
             public last: Option<ValueObject>,
@@ -208,7 +208,6 @@ export namespace Line {
         }
 
         //분리시키는 함수.
-        //유념할 점은 여기서 합쳐지는게 아니다. 어딘가 다른부분에서 라인이 합쳐지는 문제가 있다.
         public divide(startIndex: number, endIndex: number): Array<Line.ValueObject> {
             //init을 통해 result와 tokenQueue배열을 선언해준다.
             this.init();
@@ -218,7 +217,6 @@ export namespace Line {
                 let tokenEndAfterLabelMerged = this.mergeLabel(currentTokenEnd);
                 let tokenEndAfterWordsMerged = this.mergeWord(tokenEndAfterLabelMerged);
                 const noMergePerformed = tokenEndAfterLabelMerged === currentTokenEnd && tokenEndAfterLabelMerged === tokenEndAfterWordsMerged;
-                //이소스가 줄넘김을 파악하는 소스로 추측
                 if (this.store.content[currentTokenEnd - 1] === '\n') {
                     //다음줄로 넘어가는 부분이라면?
                     if (this.tokenQueue.length === 0) {
@@ -303,6 +301,7 @@ export namespace Line {
         }
 
         private shiftWithAutoReduce(token: Token) {
+            //라인을 넘기는 함수.
             const currentQueueWidth = this.tokenQueue.length === 0 ? 0 : this.view.contentWidth(this.tokenQueue[0].startIndex, this.tokenQueue[this.tokenQueue.length - 1].endIndex);
             const currentTokenWidth = this.view.contentWidth(token.startIndex, token.endIndex);
             if (this.tokenQueue.length !== 0 && currentQueueWidth + currentTokenWidth > this.view.lineMaxWidth) {

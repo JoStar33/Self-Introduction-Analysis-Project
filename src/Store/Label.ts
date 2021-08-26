@@ -12,7 +12,7 @@ export namespace Label {
     }
 
     export class Entity {
-        constructor(
+        constructor(    //id값은 라벨의 id, categoryId값은 어떤 사용자가 라벨링 했는지를 알리는 값, _startIndex는 문장내에 라벨 시작값 _endIndex는 문징내에 라벨 끝값
             public readonly id: number | null,
             public readonly categoryId: number,
             private _startIndex: number,

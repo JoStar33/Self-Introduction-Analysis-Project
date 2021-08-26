@@ -7,6 +7,7 @@ export interface Config {
     readonly selectingAreaStrip: RegExp | null | undefined
 }
 
+//텍스트를 드래그했을때에 이벤트 처리를 돕는 파일.
 export class TextSelectionHandler {
     constructor(public root: Annotator,
                 private config: Config) {
@@ -23,6 +24,10 @@ export class TextSelectionHandler {
         } catch (e) {
             return null;
         }
+        //startLine: 라벨링 시작라인 
+        //endLine: 라벨링 끝라인
+        //startIndex: 시작 인덱스(몇번째 글자인지.)
+        //endIndex: 끝나는 인덱스(몇번째 글자인지.)
         let startLine: Line.ValueObject;
         let endLine: Line.ValueObject;
         let startIndex: number;
@@ -62,6 +67,7 @@ export class TextSelectionHandler {
     textSelected() {
         let selectionInfo = this.getSelectionInfo();
         if (selectionInfo) {
+            //텍스트가 선택되었음을 알림. (View.ts내에 this.root.textSelectionHandler.textSelected();참조.)
             this.root.emit('textSelected', selectionInfo.startIndex, selectionInfo.endIndex);
         }
         window.getSelection().removeAllRanges();

@@ -1,4 +1,4 @@
-<!--요구사항 3page 4 내용-->
+<!--요구사항 3page 4 생애주기 그래프 영역-->
 <template>
     <GChart
         id="Timeline"
@@ -27,6 +27,7 @@ export default {
       endYear: null,
       endMonth: null,
       endDate: null,
+      //timelineData의 기본틀을 잡아줌.
       timelineData: [  
         [
           { type: 'string', id: 'Term' },
@@ -61,7 +62,7 @@ export default {
     let title_Array = []; //몇번째 줄에 타이틀이 무엇인지를 정의(커리어 종류)
     let title_of_Color = [[255, 0, 0], [51, 102, 255], [253, 220, 0]]; //색의 rgb값 정보를 담는 배열.
     let title_Number_In_One_Line = []; //하나의 라인에 몇개의 라벨이 들어있는지를 판별.
-    let title_Number_In_One_Line_Current = []; //현재 이라인에 라벨의 위치
+    let title_Number_In_One_Line_Current = []; //현재 이라인에 라벨의 위치. 타임라인 바가 시간이 지날수록 연해지게 설계하기위해서 만든 배열이다.
 
     this.Init_Of_title_Number_In_One_Line(title_Number_In_One_Line, title_Number_In_One_Line_Current);
     this.titleArray_Pusher(title_Array, title_Number_In_One_Line);
@@ -69,7 +70,7 @@ export default {
   },
 
   methods: {
-    //가로열 몇번째 값인지를 가지는 배열.
+    //배열을 초기화해주는 함수.
     Init_Of_title_Number_In_One_Line(title_Number_In_One_Line, title_Number_In_One_Line_Current){
       for(let i = 0; i < timelineJson.items.length; ++i){
         title_Number_In_One_Line[i] = 0;
@@ -90,13 +91,13 @@ export default {
 
     Input_Into_timelineData(titleArray, title_of_Color, title_Number_In_One_Line, title_Number_In_One_Line_Current){
       for(const timeItems of timelineJson.items){
-        let timelineStart = parseInt(timeItems.startDate);
+        let timelineStart = parseInt(timeItems.startDate); //시작날짜 끝나는 날짜를 가지고온다.
         let timelineEnd = parseInt(timeItems.endDate);
-        [this.startYear, this.startMonth, this.startDate] = this.Make_YearMonthDate(timelineStart);
+        [this.startYear, this.startMonth, this.startDate] = this.Make_YearMonthDate(timelineStart); //가지고 온값을 Date의 형태로 만들어야 하기때문에 Make_YearMonthDate함수를 실행.
         [this.endYear, this.endMonth, this.endDate] = this.Make_YearMonthDate(timelineEnd);
-        [this.minYear, this.maxYear] = this.setMaxMinYear(this.startYear, this.endYear, this.minYear, this.maxYear)
+        [this.minYear, this.maxYear] = this.setMaxMinYear(this.startYear, this.endYear, this.minYear, this.maxYear) //최초 시작년도, 최후반으로 끝나는 년도의 값을 구한다.
         let title = String(timeItems.title);
-        ++title_Number_In_One_Line_Current[titleArray.indexOf(title)];
+        ++title_Number_In_One_Line_Current[titleArray.indexOf(title)]; //현재위치를 저장한다.
 
         //최종적으로는 timelineData에 계산해준 값들을 배열로 만들고 넣어준다.
         this.timelineData.push(
