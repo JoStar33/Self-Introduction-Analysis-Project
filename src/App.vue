@@ -12,11 +12,13 @@
         </v-app-bar>
         <v-content fluid="fluid">
             <v-card class="top-Part">
+                <!--요구사항 3page 2-1 내용-->
                 <v-img
                     src="./Image/profile.jpg"
                     max-width="150"
                     max-height="150"
                     style="float: left"></v-img>
+                <!--요구사항 3page 2-2 내용-->
                 <InfoApplicant id="Introduce-Part"></InfoApplicant>
             </v-card>
             <v-col>
@@ -30,6 +32,7 @@
                         경력 생애 주기
                     </v-alert>
                     <div id="TimelineBox">
+                        <!--요구사항 3page 4 내용-->
                         <TimeLine></TimeLine>
                     </div>
                 </v-card>
@@ -43,6 +46,7 @@
                             border="left">
                             자기소개서 키워드
                         </v-alert>
+                        <!--요구사항 5page 1 내용-->
                         <KeywordsApplication></KeywordsApplication>
                     </v-card>
                     <v-card>
@@ -54,6 +58,8 @@
                             border="left">
                             지원자 자기소개서
                         </v-alert>
+                        <!--요구사항 5page 2 내용-->
+                        <!--세부적인 사항들은 Annotate.vue파일 참조-->
                         <Annotate class="LabelProject"></Annotate>
                     </v-card>
                 </div>

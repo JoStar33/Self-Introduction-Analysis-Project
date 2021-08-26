@@ -117,6 +117,7 @@ export namespace LabelView {
             this.svgElement.remove();
         }
 
+        //7page 1번 하이라이팅 표시
         //하이라이트된 라벨을 그려주는 함수
         private createHighLightElement() {
             const highLightElement = document.createElementNS(SVGNS, 'rect') as SVGRectElement;
@@ -127,6 +128,7 @@ export namespace LabelView {
             return highLightElement;
         }
 
+        //6page 4번 취소 버튼
         //삭제버튼을 그려주는 함수
         private createAnnotationBtnElement(){
             const annotationBtnElement = document.createElementNS(SVGNS, 'svg') as SVGElement;

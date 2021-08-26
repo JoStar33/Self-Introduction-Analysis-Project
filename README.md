@@ -11,31 +11,21 @@
 
 ![ezgif-2-7e03fb5b7d45](https://user-images.githubusercontent.com/52379503/130410408-28a8d522-f126-4a07-9ff6-08a467414188.gif)
 
-
+파일은 vue파일과 typeScript파일이 메인으로 잡혀있고, typeScript파일의 경우는 Annotate.vue파일의 기능을 구현하는 파일들입니다.
 
 ## Project setup
 ```
-yarn install
+npm install
 ```
 
 ### Compiles and hot-reloads for development
 ```
-yarn run serve
+npm run serve
 ```
 
 ### Compiles and minifies for production
 ```
-yarn run build
-```
-
-### Run your tests
-```
-yarn run test
-```
-
-### Lints and fixes files
-```
-yarn run lint
+npm run build
 ```
 
 ### Customize configuration
