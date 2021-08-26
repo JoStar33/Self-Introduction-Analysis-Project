@@ -120,6 +120,7 @@
                     }
                 },
 
+                //Json의 상태를 업데이트 해주는 함수이다.
                 updateJSON(): void {
                     for (var i = 0; i <= defaultData.introductions.length; ++i) {
                         if(defaultData.introductions[i].id === this.annotator.store.json.id){

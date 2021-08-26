@@ -2,6 +2,7 @@ import {LabelCategory} from "./LabelCategory";
 import {Label} from "./Label";
 import {EventEmitter} from "events";
 
+//전체적으로 쓰는 default.json파일의 내용을 저장하는 ts파일
 export interface Config extends LabelCategory.Config, Label.Config{
     readonly contentEditable: boolean;
 }

@@ -1,3 +1,4 @@
+<!--요구사항 5page 1 내용-->
 <template>
     <v-row class = "KeywordsApplication">
         <p id = "keyword" v-for="keyWords in hireInfoJson.keyWords" :key="keyWords.id">

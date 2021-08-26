@@ -1,6 +1,7 @@
 import {Base} from "../Infrastructure/Repository";
 import {shadeColor} from "../Infrastructure/Color";
 
+//사용자들의 정보를 담는 ts파일.
 export namespace LabelCategory {
     export interface JSON {
         readonly id: number;

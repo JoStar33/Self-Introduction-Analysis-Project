@@ -1,3 +1,4 @@
+<!--요구사항 3page 4 내용-->
 <template>
     <GChart
         id="Timeline"
@@ -8,6 +9,7 @@
         :options="timelineOptions"/>
 </template>
 <script>
+//vue-google-charts를 불러와서 사용하기때문에 터미널에 "npm i vue-google-charts"를 입력해서 vue-google-charts를 다운해줘야함.
 import { GChart } from "vue-google-charts";
 import timelineJson from '../assets/timelineTest.json'
 

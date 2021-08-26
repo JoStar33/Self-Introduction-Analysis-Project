@@ -62,7 +62,7 @@ export class View {
         this.svgElement.style.height = this.height.toString() +'px';
         this.svgElement.setAttribute('viewBox','0 -20 '+ (svgElement.width.baseVal.value)+' '+ (this.height+30).toString());
         
-        //이벤트를 주는 함수.
+        //이벤트를 주는 함수호출.
         this.registerEventHandlers();
         if (this.config.contentEditable) {
             this.contentEditor = new ContentEditor(this);
@@ -192,9 +192,6 @@ export class View {
             line.topContext.renderChild(labelView);
             line.topContext.update();
             line.update();
-            /* For Test.
-            console.warn(`line "${i}'s id:"${this.labelViewRepository.get(testLabel.id).id}"`);
-            */
         }
     }
 

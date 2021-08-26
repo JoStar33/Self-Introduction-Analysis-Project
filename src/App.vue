@@ -123,6 +123,8 @@
                 window.addEventListener('resize', this.handleResize);
             },
             methods: {
+                //화면의 크기가 변한다면 Timelinechart를 그에 맞게 작아지거나 커지도록 만들어주는 함수.
+                //Timelinecharts가 svg로 잡혀있고 라이브러리이기 때문에 Timelinechart자체를 수정해서 차트의 크기가 줄어들때 연도가 생략되는 문제를 조정할수 없기 때문이다.
                 handleResize() {
                     this.windowWidth = window.innerWidth;
                     if(this.windowWidth < 850){
