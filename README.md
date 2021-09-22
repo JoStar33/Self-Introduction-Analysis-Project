@@ -7,8 +7,8 @@
 
 ![정보작성](https://user-images.githubusercontent.com/52379503/130021053-97e8db7f-6973-4422-b8e7-f45aaf7bc33f.png)
 
+![ISUProject](https://user-images.githubusercontent.com/52379503/134333963-337f0f6a-9827-43b5-96c7-d65b7b62e1fa.gif)
 
-![ezgif-2-7e03fb5b7d45](https://user-images.githubusercontent.com/52379503/130410408-28a8d522-f126-4a07-9ff6-08a467414188.gif)
 
 파일은 vue파일과 typeScript파일이 메인으로 잡혀있고, typeScript파일의 경우는 Annotate.vue파일의 기능을 구현하는 파일들입니다.
 
